@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Food Delivery</string>
+    <string name="facebook_app_id">622917822017734</string>
+    <string name="fb_login_protocol_scheme">fb622917822017734</string>
+</resources>
