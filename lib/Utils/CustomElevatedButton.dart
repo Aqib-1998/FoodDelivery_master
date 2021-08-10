@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:hexcolor/hexcolor.dart';
+import '../main.dart';
 
 Widget customElevatedButton(String text,onPressed){
   return SizedBox(
@@ -11,18 +11,18 @@ Widget customElevatedButton(String text,onPressed){
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(5.0),
         ),
-        primary: HexColor('#7AC301'),
+        primary: defaultColor,
         padding: EdgeInsets.symmetric(
             horizontal: 20, vertical: 10),
         elevation: 5,
         textStyle: TextStyle(
             color: Colors.white,
-            fontSize: 20,
+            fontSize: 17,
             fontWeight: FontWeight.bold),
       ),
       child: Center(
         child: Text(
-          text,style: TextStyle(fontSize: 24,fontWeight: FontWeight.w400),
+          text,style: TextStyle(fontSize: 17,fontWeight: FontWeight.w400),
 
         ),
       ),

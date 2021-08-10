@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:food_delivery/Pages/ShopeMenu.dart';
 import 'package:food_delivery/Utils/BackButton.dart';
 import 'package:food_delivery/Utils/CustomElevatedButton.dart';
 import 'package:food_delivery/Utils/CustomRichText.dart';
@@ -12,13 +13,17 @@ import 'package:food_delivery/Utils/CustomTextFiled.dart';
 
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
-final ref = FirebaseFirestore.instance.collection("Shop Users").doc(getUid.currentUser.uid).collection("Shop Menus");
-final FirebaseAuth getUid = FirebaseAuth.instance;
-String docId;
+final ref = FirebaseFirestore.instance.collection("Shop Users").doc(uid).collection("Shop Menus");
+
+
 String uploadEditedImage='';
+bool newImage = false;
 
 
 class EditMenu extends StatefulWidget {
+  final String menuName,menuAmount,menuQuantity,menuImage,docId;
+
+  const EditMenu({Key key, @required this.menuName, this.menuAmount, this.menuQuantity, this.menuImage, this.docId}) : super(key: key);
 
   @override
   _EditMenuState createState() => _EditMenuState();
@@ -29,9 +34,19 @@ class _EditMenuState extends State<EditMenu> {
   final menuAmountController = TextEditingController();
   final menuQuantityController = TextEditingController();
   @override
+  void initState() {
+    newImage = false;
+    setState(() {
+
+    });
+    // TODO: implement initState
+    super.initState();
+  }
+
   File imageFile;
   final picker = ImagePicker();
   chooseImage(ImageSource source) async{
+
     final pickedImage = await picker.getImage(source: source);
     String path =  basename(pickedImage.path);
     setState(() {
@@ -39,7 +54,7 @@ class _EditMenuState extends State<EditMenu> {
     });
 
     FirebaseStorage storage = FirebaseStorage.instance;
-    Reference ref = storage.ref().child("${getUid.currentUser.uid}'/ $path ");
+    Reference ref = storage.ref().child("$uid'/ $path ");
     UploadTask uploadTask = ref.putFile(imageFile);
     //url = await ref.getDownloadURL();
     uploadTask.then((res) async {
@@ -47,6 +62,8 @@ class _EditMenuState extends State<EditMenu> {
       print(uploadEditedImage);
     }).whenComplete((){
       setState(() {
+        newImage = true;
+
       });
     });
     print(uploadEditedImage);
@@ -80,39 +97,33 @@ class _EditMenuState extends State<EditMenu> {
                       child: imageFile != null
                           ? Container(
                         decoration: BoxDecoration(
+                            borderRadius: BorderRadius.all(Radius.circular(15)),
                             image: DecorationImage(
-                                image: FileImage(imageFile))),
+                                image: FileImage(imageFile),fit: BoxFit.fill)),
                       )
                           : Container(
                         decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey),
-                            image: DecorationImage(
-                                alignment: Alignment.center,
-                                image: AssetImage(
-                                    "lib/Images/chooseimage.png"),
-                                fit: BoxFit.cover)),
+                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                        ),
+                              child: ClipRRect(borderRadius: BorderRadius.all(Radius.circular(15)),child: Image.network(widget.menuImage,fit: BoxFit.fill,)),
                       ),
                     ),
                   ),
                   SizedBox(height: 10,),
-                  customTextField("Enter Name",TextInputType.text,menuNameController),
+                  customTextField("${widget.menuName}",TextInputType.text,menuNameController),
                   SizedBox(height: 10,),
-                  customTextField("Enter Amount",TextInputType.number,menuAmountController),
+                  customTextField("${widget.menuAmount}",TextInputType.number,menuAmountController),
                   SizedBox(height: 10,),
-                  customTextField("Enter Quantity",TextInputType.number,menuQuantityController),
+                  customTextField("${widget.menuQuantity}",TextInputType.number,menuQuantityController),
                   SizedBox(height: 50,),
-                  customElevatedButton("Add to Menu",() async {
-                    await ref.get().then((value) {
-                      value.docs.forEach((element) {
-                        docId = element.id;
-                      });
-                    });
-                    if(menuNameController.text.isNotEmpty && menuQuantityController.text.isNotEmpty && menuAmountController.text.isNotEmpty && uploadEditedImage.isNotEmpty){
-                      await ref.doc(docId).set({
+                  customElevatedButton("Done",() async {
+
+                    if(menuNameController.text.isNotEmpty && menuQuantityController.text.isNotEmpty && menuAmountController.text.isNotEmpty){
+                      await ref.doc(widget.docId).update({
                         "Menu Name":menuNameController.text,
                         "Menu Amount":menuAmountController.text,
                         "Menu Quantity":menuQuantityController.text ,
-                        "Menu Image": uploadEditedImage//your data which will be added to the collection and collection will be created after this
+                        "Menu Image": newImage?uploadEditedImage??widget.menuImage:widget.menuImage//your data which will be added to the collection and collection will be created after this
                       }).then((_){
                         final snackBar = SnackBar(content: Text('Menu edited!'));
                         ScaffoldMessenger.of(context).showSnackBar(snackBar);

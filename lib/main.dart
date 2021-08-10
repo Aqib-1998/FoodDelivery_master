@@ -9,6 +9,11 @@ import 'Pages/LoginScreen.dart';
 import 'package:page_transition/page_transition.dart';
 
 Color defaultColor =  HexColor('#7AC301');
+Color customButtonColor = HexColor('#F4F4F4');
+Color ratingColor = HexColor('#FFD200');
+Color textFieldColor = HexColor('#DEDEDE');
+Color textFieldFillColor = HexColor('#e6e6e6');
+Color totalFieldColor =HexColor('#C4C4C4');
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

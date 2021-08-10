@@ -2,16 +2,23 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:hexcolor/hexcolor.dart';
 import '../main.dart';
 import 'CustomRichText.dart';
+
 var firebaseUser = FirebaseAuth.instance.currentUser;
 final _auth = FirebaseAuth.instance;
-void bottomSheet(context, String address, String mainTitle, String Subttl,String dTitle,String dHintText,dOnChanged,dOnSubmit,String changedString,String whatValue) {
 
-
-
-
+void bottomSheet(
+    context,
+    String address,
+    String mainTitle,
+    String subTitle,
+    String dTitle,
+    String dHintText,
+    dOnChanged,
+    dOnSubmit,
+    String changedString,
+    String whatValue) {
   showModalBottomSheet(
       context: context,
       builder: (builder) {
@@ -37,10 +44,17 @@ void bottomSheet(context, String address, String mainTitle, String Subttl,String
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        customRichText(mainTitle, " $Subttl"),
+                        customRichText(mainTitle, " $subTitle"),
                         InkWell(
-                          onTap: (){
-                            displayTextInputDialog(context,dTitle,dHintText,dOnChanged,dOnSubmit,changedString,whatValue);
+                          onTap: () {
+                            displayTextInputDialog(
+                                context,
+                                dTitle,
+                                dHintText,
+                                dOnChanged,
+                                dOnSubmit,
+                                changedString,
+                                whatValue);
                           },
                           child: Container(
                               height: 44,
@@ -67,12 +81,18 @@ void bottomSheet(context, String address, String mainTitle, String Subttl,String
               )),
         );
       });
-
 }
 
-
 final _textFieldController = TextEditingController();
-Future<void> displayTextInputDialog(BuildContext context,String title,String hintText,onChanged,onSubmit,String changedString,String whatValue) async {
+
+Future<void> displayTextInputDialog(
+    BuildContext context,
+    String title,
+    String hintText,
+    onChanged,
+    onSubmit,
+    String changedString,
+    String whatValue) async {
   return showDialog(
       context: context,
       builder: (context) {
@@ -81,8 +101,8 @@ Future<void> displayTextInputDialog(BuildContext context,String title,String hin
           content: TextField(
             onChanged: (value) {
               onChanged;
-                changedString = value;
-                print(changedString);
+              changedString = value;
+              print(changedString);
             },
             controller: _textFieldController,
             decoration: InputDecoration(hintText: hintText),
@@ -93,7 +113,6 @@ Future<void> displayTextInputDialog(BuildContext context,String title,String hin
               textColor: Colors.white,
               child: Text('OK'),
               onPressed: () async {
-
                 var docRef = await FirebaseFirestore.instance
                     .collection("Shop Users")
                     .doc(_auth.currentUser.uid)
@@ -110,30 +129,26 @@ Future<void> displayTextInputDialog(BuildContext context,String title,String hin
 
                 onSubmit;
                 // print(changedString);
-                  //codeDialog = valueText;
+                //codeDialog = valueText;
 
-                  Navigator.pop(context);
+                Navigator.pop(context);
                 _textFieldController.clear();
-
               },
             ),
-
           ],
         );
       });
 }
 
-
-
 void reviewBottomSheet(
-    context, String address, String mainTitle, String Subttl) {
+    context, String address, String mainTitle, String Subtitle) {
   showModalBottomSheet(
       context: context,
       builder: (builder) {
         return Container(
           height: MediaQuery.of(context).size.height / 1.15,
-          color: Color(0xFF737373), //could change this to Color(0xFF737373),
-          //so you don't have to change MaterialApp canvasColor
+          color: Color(0xFF737373), //could change this to Color(0xFF737373)
+
           child: Container(
               decoration: BoxDecoration(
                   color: Colors.white,
@@ -152,7 +167,7 @@ void reviewBottomSheet(
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        customRichText(mainTitle, " $Subttl"),
+                        customRichText(mainTitle, " $Subtitle"),
                         Container(
                             height: 44,
                             width: 42,
@@ -175,7 +190,7 @@ void reviewBottomSheet(
                                 width: MediaQuery.of(context).size.width,
                                 height: 125,
                                 child: Card(
-                                  color: HexColor('#F4F4F4'),
+                                  color: customButtonColor,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(15.0),
                                   ),
@@ -223,7 +238,7 @@ void reviewBottomSheet(
                                               horizontal: 3.0),
                                           itemBuilder: (context, _) => Icon(
                                             Icons.star,
-                                            color: HexColor('#FFD200'),
+                                            color: ratingColor,
                                           ),
                                           onRatingUpdate: (rating) {},
                                         ),

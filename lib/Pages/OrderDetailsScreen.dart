@@ -2,11 +2,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:food_delivery/Utils/BackButton.dart';
 import 'package:food_delivery/Utils/CustomRichText.dart';
-import 'package:hexcolor/hexcolor.dart';
 
-final orderDetailTextStyle = TextStyle(fontWeight: FontWeight.w300, fontSize: 16);
-final firstRowTextStyle = TextStyle(fontSize: 16,fontWeight: FontWeight.bold);
-final rowTextStyle = TextStyle(fontSize: 16,fontWeight: FontWeight.w300);
+import '../main.dart';
+
+
+final orderDetailTextStyle = TextStyle(fontWeight: FontWeight.w300, fontSize: 14);
+final firstRowTextStyle = TextStyle(fontSize: 15,fontWeight: FontWeight.bold);
+final rowTextStyle = TextStyle(fontSize: 14,fontWeight: FontWeight.w300);
 
 class OrderDetailsScreen extends StatelessWidget {
   @override
@@ -43,7 +45,7 @@ class OrderDetailsScreen extends StatelessWidget {
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(100.0),
                               ),
-                              primary: HexColor('#F4F4F4')),
+                              primary: customButtonColor),
                           onPressed: () {},
                           label: Image.asset(
                             'lib/Images/location.png',
@@ -65,7 +67,7 @@ class OrderDetailsScreen extends StatelessWidget {
                       height: MediaQuery.of(context).size.height / 3.0,
                       width: MediaQuery.of(context).size.width,
                       decoration: BoxDecoration(
-                          color: HexColor('#F4F4F4'),
+                          color: customButtonColor,
                           borderRadius:
                               BorderRadius.all(Radius.circular(12.0))),
                       child: Padding(
@@ -110,7 +112,7 @@ class OrderDetailsScreen extends StatelessWidget {
 
                       width: MediaQuery.of(context).size.width,
                       decoration: BoxDecoration(
-                          color: HexColor('#F4F4F4'),
+                          color: customButtonColor,
                           borderRadius:
                           BorderRadius.only(topRight: Radius.circular(12),topLeft: Radius.circular(12))),
                       child: Padding(
@@ -177,7 +179,7 @@ class OrderDetailsScreen extends StatelessWidget {
                       width: MediaQuery.of(context).size.width,
                       height: MediaQuery.of(context).size.height/15,
                       decoration: BoxDecoration(
-                          color: HexColor('#C4C4C4'),
+                          color: totalFieldColor,
                           borderRadius:
                           BorderRadius.only(bottomRight: Radius.circular(12),bottomLeft: Radius.circular(12))),
                       child: Padding(

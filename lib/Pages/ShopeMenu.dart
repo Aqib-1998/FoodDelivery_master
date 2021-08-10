@@ -5,18 +5,23 @@ import 'package:food_delivery/Pages/EditMenuScreen.dart';
 import 'package:food_delivery/Utils/BackButton.dart';
 import 'package:food_delivery/Utils/CustomElevatedButton.dart';
 import 'package:food_delivery/Utils/CustomRichText.dart';
-import 'package:hexcolor/hexcolor.dart';
-
+import '../main.dart';
 import 'AddMenuScreen.dart';
-import 'CreateShopPage.dart';
 
-final FirebaseAuth getUid = FirebaseAuth.instance;
-final ref =  FirebaseFirestore.instance
+TextStyle subTitleStyle = TextStyle(fontWeight: FontWeight.w600, fontSize: 11);
+TextStyle titleStyle = TextStyle(fontWeight: FontWeight.w600, fontSize: 14);
+String uid = FirebaseAuth.instance.currentUser.uid;
+final ref = FirebaseFirestore.instance
     .collection("Shop Users")
-    .doc(getUid.currentUser.uid)
+    .doc(uid)
     .collection('Shop Menus');
-String docId;
-class ShopMenu extends StatelessWidget {
+
+class ShopMenu extends StatefulWidget {
+  @override
+  _ShopMenuState createState() => _ShopMenuState();
+}
+
+class _ShopMenuState extends State<ShopMenu> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -44,10 +49,13 @@ class ShopMenu extends StatelessWidget {
                 Expanded(
                   child: Container(
                     child: StreamBuilder(
-                        stream: ref
-                            .snapshots(),
+                        stream: ref.snapshots(),
                         builder: (context, snapshot) {
-                          String menuName, menuAmount, menuQuantity, menuImage;
+                          List<String> menuName = [],
+                              menuAmount = [],
+                              menuQuantity = [],
+                              menuImage = [],
+                              docId = [];
 
                           if (!snapshot.hasData) {
                             return Center(
@@ -63,68 +71,93 @@ class ShopMenu extends StatelessWidget {
                           return ListView.builder(
                             itemCount: snapshot.data.docs.length,
                             itemBuilder: (context, index) {
-                              menuName = snapshot.data.docs[index]["Menu Name"];
-                              menuAmount =
-                                  snapshot.data.docs[index]["Menu Amount"];
-                              menuQuantity =
-                                  snapshot.data.docs[index]["Menu Quantity"];
-                              menuImage =
-                                  snapshot.data.docs[index]["Menu Image"];
+                              menuName
+                                  .add(snapshot.data.docs[index]["Menu Name"]);
+                              docId.add(snapshot.data.docs[index].id);
+                              menuAmount.add(
+                                  snapshot.data.docs[index]["Menu Amount"]);
+                              menuQuantity.add(
+                                  snapshot.data.docs[index]["Menu Quantity"]);
+                              menuImage
+                                  .add(snapshot.data.docs[index]["Menu Image"]);
                               return Card(
                                 elevation: 3,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(15.0),
                                 ),
-                                color: HexColor('#F4F4F4'),
+                                color: customButtonColor,
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     Container(
-                                      height: MediaQuery.of(context).size.height / 7,
-                                      width: MediaQuery.of(context).size.width / 3,
+                                      height:
+                                      MediaQuery
+                                          .of(context)
+                                          .size
+                                          .height /
+                                          7,
+                                      width:
+                                      MediaQuery
+                                          .of(context)
+                                          .size
+                                          .width / 3,
                                       decoration: BoxDecoration(
                                         color: Colors.transparent,
                                         borderRadius: BorderRadius.all(
                                             Radius.circular(15)),
                                       ),
                                       child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(12.0),
+                                          borderRadius:
+                                          BorderRadius.circular(12.0),
                                           child: Image.network(
-                                        menuImage,
-                                        fit: BoxFit.fill,
-                                      )),
+                                            menuImage[index],
+                                            fit: BoxFit.fill,
+                                          )),
                                     ),
                                     SizedBox(
                                       width: 20,
                                     ),
                                     Column(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.start,
+                                      MainAxisAlignment.start,
                                       crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                      CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          menuName,
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w600),
+                                          menuName[index],
+                                          style: titleStyle,
                                         ),
                                         Text(
-                                          "$menuAmount Rs. per $menuQuantity kg",
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w600),
+                                          "${menuAmount[index]} Rs. per ${menuQuantity[index]} kg",
+                                          style:subTitleStyle,
                                         ),
                                         Row(
                                           mainAxisAlignment:
-                                              MainAxisAlignment.start,
+                                          MainAxisAlignment.start,
                                           crossAxisAlignment:
-                                              CrossAxisAlignment.center,
+                                          CrossAxisAlignment.center,
                                           children: [
                                             InkWell(
-                                              onTap: (){
+                                              onTap: () {
                                                 Navigator.push(
                                                   context,
-                                                  MaterialPageRoute(builder: (context) => EditMenu()),
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          EditMenu(
+                                                            menuName:
+                                                            menuName[index],
+                                                            menuAmount:
+                                                            menuAmount[
+                                                            index],
+                                                            menuImage:
+                                                            menuImage[
+                                                            index],
+                                                            menuQuantity:
+                                                            menuQuantity[
+                                                            index],
+                                                            docId: docId[index],
+                                                          )),
                                                 );
                                               },
                                               child: Container(
@@ -136,7 +169,7 @@ class ShopMenu extends StatelessWidget {
                                                         image: AssetImage(
                                                             'lib/Images/edt_icon.png'),
                                                         alignment:
-                                                            Alignment.center,
+                                                        Alignment.center,
                                                         fit: BoxFit.cover)),
                                               ),
                                             ),
@@ -145,11 +178,13 @@ class ShopMenu extends StatelessWidget {
                                             ),
                                             InkWell(
                                               onTap: () async {
-                                                await FirebaseFirestore.instance.runTransaction((Transaction myTransaction) async {
-                                                  await myTransaction.delete(snapshot.data.docs[index].reference);
-
+                                                await FirebaseFirestore.instance
+                                                    .runTransaction((Transaction
+                                                myTransaction) async {
+                                                  await myTransaction.delete(
+                                                      snapshot.data.docs[index]
+                                                          .reference);
                                                 });
-
                                               },
                                               child: Container(
                                                 height: 30,
@@ -160,7 +195,7 @@ class ShopMenu extends StatelessWidget {
                                                         image: AssetImage(
                                                             'lib/Images/dlt_icon.png'),
                                                         alignment:
-                                                            Alignment.center,
+                                                        Alignment.center,
                                                         fit: BoxFit.cover)),
                                               ),
                                             )

@@ -13,12 +13,7 @@ var imageDir;
 final fireStore = FirebaseFirestore.instance;
 final FirebaseAuth getUid = FirebaseAuth.instance;
 String url= '';
-//
-// Future<String> createUserFireStoreGoogle(User user) async {
-//   String retVal = "error";
-//
-//   return retVal;
-// }
+
 
 class CreateShopPage extends StatefulWidget {
   final auth;
@@ -148,7 +143,7 @@ class _CreateShopPageState extends State<CreateShopPage> {
                     if(shopContactController.text.isNotEmpty && shopAddressController.text.isNotEmpty && shopNameController.text.isNotEmpty && url.isNotEmpty){
 
                    await FirebaseFirestore.instance.collection("Shop Users").doc(getUid.currentUser.uid).collection("Shop info").add({
-                      "Shop Name":shopNameController.text,
+                     "Shop Name":shopNameController.text,
                      "Shop Address":shopAddressController.text,
                      "Shop Contact":shopContactController.text ,
                      "Shop Image": url//your data which will be added to the collection and collection will be created after this

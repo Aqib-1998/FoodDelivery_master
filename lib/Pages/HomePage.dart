@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -9,8 +8,8 @@ import 'package:food_delivery/Utils/BottomSheet.dart';
 import 'package:food_delivery/Utils/CustomButton.dart';
 import 'package:food_delivery/Utils/CustomRichText.dart';
 import 'package:food_delivery/Utils/auth.dart';
+import 'package:food_delivery/Utils/platform_alert_dialog.dart';
 import 'package:food_delivery/main.dart';
-import 'package:hexcolor/hexcolor.dart';
 import 'package:image_picker/image_picker.dart';
 import 'LoginScreen.dart';
 import 'OrderDetailsScreen.dart';
@@ -38,16 +37,27 @@ class _HomePageState extends State<HomePage> {
             context,
             MaterialPageRoute(builder: (context) => MyApp()),
             ModalRoute.withName('/'));
+        uid = null;
       });
     } catch (e) {}
   }
+  Future<void> _confirmSignOut(BuildContext context) async {
+    final didRequestSignOut = await PlatformAlertDialog(
+      title:  'Sign out' ,
+      content: 'Are you sure?',
+      defaultActionText:  'Sign out' ,
+      cancelActionText: 'Cancel',
+    ).show(context);
+    if (didRequestSignOut == true) {
+      _signOut();
+    }
+  }
 
-  var firebaseUser = FirebaseAuth.instance.currentUser;
 
   Future<void> getUserInfo() async {
     await FirebaseFirestore.instance
         .collection('Shop Users')
-        .doc(firebaseUser.uid)
+        .doc(uid)
         .collection("Shop info")
         .get()
         .then((querySnapshot) {
@@ -65,7 +75,6 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     getUserInfo();
-    print(shopName);
     setState(() {});
     // TODO: implement initState
     super.initState();
@@ -79,10 +88,8 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       imageFile = File(pickedImage.path);
     });
-    final FirebaseAuth getUid = FirebaseAuth.instance;
-
     FirebaseStorage storage = FirebaseStorage.instance;
-    Reference ref = storage.ref().child(getUid.currentUser.uid);
+    Reference ref = storage.ref().child(uid);
     UploadTask uploadTask = ref.putFile(imageFile);
 
     //url = await ref.getDownloadURL();
@@ -93,13 +100,13 @@ class _HomePageState extends State<HomePage> {
       shopImage = url;
       var docRef = await FirebaseFirestore.instance
           .collection("Shop Users")
-          .doc(_auth.currentUser.uid)
+          .doc(uid)
           .collection("Shop info")
           .get();
       docRef.docs.forEach((result) {
         FirebaseFirestore.instance
             .collection('Shop Users')
-            .doc(firebaseUser.uid)
+            .doc(uid)
             .collection("Shop info")
             .doc(result.id)
             .update({"Shop Image": url});
@@ -110,8 +117,6 @@ class _HomePageState extends State<HomePage> {
 
     print(url);
   }
-
-  final _auth = FirebaseAuth.instance;
   void  refresh(){
     setState(() {
       getUserInfo();
@@ -121,7 +126,7 @@ class _HomePageState extends State<HomePage> {
   Future getDocs() async {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
         .collection("Shop Users")
-        .doc(_auth.currentUser.uid)
+        .doc(uid)
         .collection("New User?")
         .get();
     for (int i = 0; i < querySnapshot.docs.length; i++) {
@@ -178,21 +183,13 @@ class _HomePageState extends State<HomePage> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          shopName != null
-                              ? Text(
-                                  shopName,
-                                  style: TextStyle(
-                                      fontSize: 30, fontWeight: FontWeight.w700),
-                                )
-                              : Text('Fetching data...'),
-                          IconButton(onPressed:(){
-                            refresh();
-                          } , icon: Icon(Icons.refresh))
-                        ],
-                      ),
+                      shopName != null
+                          ? Text(
+                              shopName,
+                              style: TextStyle(
+                                  fontSize: 26, fontWeight: FontWeight.w700),
+                            )
+                          : CircularProgressIndicator(),
                       SizedBox(
                         height: 20,
                       ),
@@ -271,28 +268,32 @@ class _HomePageState extends State<HomePage> {
                       ),
                       customButton(
                           'Shop Address',
-                          () => bottomSheet(
-                                  context,
-                                  "$shopAddress",
-                                  "Shop",
-                                  "Address",
-                                  "Change Address.",
-                                  "Enter new Address", () {
-                                setState(() {});
-                              }, () {
-                                setState(() {
-                                  getUserInfo();
+                          (){
+                            bottomSheet(
+                                context,
+                                "$shopAddress",
+                                "Shop",
+                                "Address",
+                                "Change Address.",
+                                "Enter new Address", () {
+                              setState(() {});
+                            }, () {
+                              setState(() {
+                                getUserInfo();
 
-                                  shopAddress = newAddress;
-                                });
-                              },
-                              newAddress,"Shop Address")),
+                                shopAddress = newAddress;
+                              });
+                            },
+                                newAddress,"Shop Address");
+                            refresh();
+                          }
+                          ),
                       SizedBox(
                         height: 10,
                       ),
                       customButton(
                           'Contact Number',
-                          () => bottomSheet(
+                          (){ bottomSheet(
                                   context,
                                   "$shopContact",
                                   "Contact",
@@ -307,7 +308,10 @@ class _HomePageState extends State<HomePage> {
                                 });
                               },
                           newContact,
-                          "Shop Contact")),
+                          "Shop Contact");
+                          refresh();
+  }
+                      ),
                       SizedBox(
                         height: 10,
                       ),
@@ -318,7 +322,7 @@ class _HomePageState extends State<HomePage> {
                       SizedBox(
                         height: 10,
                       ),
-                      customButton('Sign Out', () => _signOut()),
+                      customButton('Sign Out', () => _confirmSignOut(context)),
                     ],
                   ),
                 ),
@@ -350,7 +354,7 @@ class _HomePageState extends State<HomePage> {
                                 width: MediaQuery.of(context).size.width,
                                 height: 125,
                                 child: Card(
-                                  color: HexColor('#F4F4F4'),
+                                  color: customButtonColor,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(15.0),
                                   ),
@@ -429,7 +433,7 @@ class _HomePageState extends State<HomePage> {
                                   width: MediaQuery.of(context).size.width,
                                   height: 125,
                                   child: Card(
-                                    color: HexColor('#F4F4F4'),
+                                    color: customButtonColor,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(15.0),
                                     ),
