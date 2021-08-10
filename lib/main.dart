@@ -32,9 +32,9 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         home: AnimatedSplashScreen(
             duration: 3,
-            splash: "lib/Images/SplashScreen.png",
+            splash: "lib/Images/SplashScreen.jpg",
             nextScreen: CheckUser(auth: Auth(),),
-            splashIconSize: 100,
+            splashIconSize: 75.0,
             animationDuration: Duration(seconds: 1),
             pageTransitionType: PageTransitionType.leftToRightWithFade,
             splashTransition: SplashTransition.slideTransition,

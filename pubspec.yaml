@@ -74,6 +74,7 @@ flutter:
     - lib/Images/location.png
     - lib/Images/facebk.png
     - lib/Images/editicon.png
+    - lib/Images/SplashScreen.jpg
 
 
   # An image asset can refer to one or more resolution-specific "variants", see
@@ -99,3 +100,5 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+lib/Images/SplashScreen:
+  jpg:
