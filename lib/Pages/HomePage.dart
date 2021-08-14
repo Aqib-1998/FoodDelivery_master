@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -10,10 +11,14 @@ import 'package:food_delivery/Utils/CustomRichText.dart';
 import 'package:food_delivery/Utils/auth.dart';
 import 'package:food_delivery/Utils/platform_alert_dialog.dart';
 import 'package:food_delivery/main.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'LoginScreen.dart';
 import 'OrderDetailsScreen.dart';
 import 'ShopeMenu.dart';
+
+
 
 String shopName,shopAddress,shopContact,newAddress,newContact;
 var shopImage;
@@ -21,8 +26,9 @@ String url = '';
 
 class HomePage extends StatefulWidget {
   final AuthBase auth;
+  final String uid;
 
-  const HomePage({Key key, @required this.auth}) : super(key: key);
+  const HomePage({Key key, @required this.auth,@required this.uid}) : super(key: key);
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -37,7 +43,7 @@ class _HomePageState extends State<HomePage> {
             context,
             MaterialPageRoute(builder: (context) => MyApp()),
             ModalRoute.withName('/'));
-        uid = null;
+
       });
     } catch (e) {}
   }
@@ -52,12 +58,32 @@ class _HomePageState extends State<HomePage> {
       _signOut();
     }
   }
+  var locationMessage = "";
+  String _currentAddress = "";
+
+  void getCurrentLocation() async{
+    var position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    var longitude = position.longitude,latitude = position.latitude;
+    List<Placemark> placemarks = await placemarkFromCoordinates(
+        latitude,
+        longitude
+    );
+    Placemark place = placemarks[0];
+
+    setState(() {
+      locationMessage = "$latitude , $longitude";
+      _currentAddress = "${place.street}, ${place.locality},${place.administrativeArea}, ${place.country}";
+      print(locationMessage);
+      print(_currentAddress);
+    });
+  }
 
 
   Future<void> getUserInfo() async {
+    print(widget.uid);
     await FirebaseFirestore.instance
         .collection('Shop Users')
-        .doc(uid)
+        .doc(widget.uid)
         .collection("Shop info")
         .get()
         .then((querySnapshot) {
@@ -75,7 +101,9 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     getUserInfo();
-    setState(() {});
+    setState(() {
+      print(widget.uid);
+    });
     // TODO: implement initState
     super.initState();
   }
@@ -89,7 +117,7 @@ class _HomePageState extends State<HomePage> {
       imageFile = File(pickedImage.path);
     });
     FirebaseStorage storage = FirebaseStorage.instance;
-    Reference ref = storage.ref().child(uid);
+    Reference ref = storage.ref().child(widget.uid);
     UploadTask uploadTask = ref.putFile(imageFile);
 
     //url = await ref.getDownloadURL();
@@ -100,13 +128,13 @@ class _HomePageState extends State<HomePage> {
       shopImage = url;
       var docRef = await FirebaseFirestore.instance
           .collection("Shop Users")
-          .doc(uid)
+          .doc(widget.uid)
           .collection("Shop info")
           .get();
       docRef.docs.forEach((result) {
         FirebaseFirestore.instance
             .collection('Shop Users')
-            .doc(uid)
+            .doc(widget.uid)
             .collection("Shop info")
             .doc(result.id)
             .update({"Shop Image": url});
@@ -126,7 +154,7 @@ class _HomePageState extends State<HomePage> {
   Future getDocs() async {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
         .collection("Shop Users")
-        .doc(uid)
+        .doc(widget.uid)
         .collection("New User?")
         .get();
     for (int i = 0; i < querySnapshot.docs.length; i++) {
@@ -260,7 +288,7 @@ class _HomePageState extends State<HomePage> {
                       customButton('Shop Menu', () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => ShopMenu()),
+                          MaterialPageRoute(builder: (context) => ShopMenu(uid: widget.uid,)),
                         );
                       }),
                       SizedBox(
@@ -269,6 +297,7 @@ class _HomePageState extends State<HomePage> {
                       customButton(
                           'Shop Address',
                           (){
+
                             bottomSheet(
                                 context,
                                 "$shopAddress",
@@ -478,6 +507,12 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ],
+          ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+            getUserInfo();
+            getCurrentLocation();
+            }
           ),
         ),
       ),

@@ -14,7 +14,7 @@ import 'package:food_delivery/Utils/CustomTextFiled.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
 final ref = FirebaseFirestore.instance.collection("Shop Users").doc(uid).collection("Shop Menus");
-
+String uid = FirebaseAuth.instance.currentUser.uid;
 
 String uploadEditedImage='';
 bool newImage = false;

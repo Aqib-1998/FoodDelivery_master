@@ -84,6 +84,7 @@ class _AddMenuState extends State<AddMenu> {
                             : Container(
                           decoration: BoxDecoration(
                               border: Border.all(color: Colors.grey),
+                              borderRadius: BorderRadius.all(Radius.circular(15)),
                               image: DecorationImage(
                                   alignment: Alignment.center,
                                   image: AssetImage(

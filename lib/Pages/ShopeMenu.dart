@@ -5,23 +5,39 @@ import 'package:food_delivery/Pages/EditMenuScreen.dart';
 import 'package:food_delivery/Utils/BackButton.dart';
 import 'package:food_delivery/Utils/CustomElevatedButton.dart';
 import 'package:food_delivery/Utils/CustomRichText.dart';
+import 'package:food_delivery/Utils/platform_alert_dialog.dart';
 import '../main.dart';
 import 'AddMenuScreen.dart';
 
 TextStyle subTitleStyle = TextStyle(fontWeight: FontWeight.w600, fontSize: 11);
 TextStyle titleStyle = TextStyle(fontWeight: FontWeight.w600, fontSize: 14);
-String uid = FirebaseAuth.instance.currentUser.uid;
-final ref = FirebaseFirestore.instance
-    .collection("Shop Users")
-    .doc(uid)
-    .collection('Shop Menus');
+
+
 
 class ShopMenu extends StatefulWidget {
+  final String uid;
+
+  const ShopMenu({Key key,@required this.uid}) : super(key: key);
   @override
   _ShopMenuState createState() => _ShopMenuState();
 }
 
+
+Future<void> _confirmDelete(BuildContext context,delete()) async {
+  final deleteRequest = await PlatformAlertDialog(
+    title:  'Delete' ,
+    content: 'Are you sure?',
+    defaultActionText:  'Delete' ,
+    cancelActionText: 'Cancel',
+  ).show(context);
+  if (deleteRequest == true) {
+    delete();
+  }
+}
+
+
 class _ShopMenuState extends State<ShopMenu> {
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -49,7 +65,10 @@ class _ShopMenuState extends State<ShopMenu> {
                 Expanded(
                   child: Container(
                     child: StreamBuilder(
-                        stream: ref.snapshots(),
+                        stream: FirebaseFirestore.instance
+                            .collection("Shop Users")
+                            .doc(widget.uid)
+                            .collection('Shop Menus').snapshots(),
                         builder: (context, snapshot) {
                           List<String> menuName = [],
                               menuAmount = [],
@@ -178,13 +197,17 @@ class _ShopMenuState extends State<ShopMenu> {
                                             ),
                                             InkWell(
                                               onTap: () async {
-                                                await FirebaseFirestore.instance
-                                                    .runTransaction((Transaction
-                                                myTransaction) async {
-                                                  await myTransaction.delete(
-                                                      snapshot.data.docs[index]
-                                                          .reference);
+                                                _confirmDelete(context,() async {
+                                                  await FirebaseFirestore.instance
+                                                      .runTransaction((Transaction
+                                                  myTransaction) async {
+                                                    await myTransaction.delete(
+                                                        snapshot.data.docs[index]
+                                                            .reference);
+                                                  });
+
                                                 });
+
                                               },
                                               child: Container(
                                                 height: 30,
@@ -224,6 +247,11 @@ class _ShopMenuState extends State<ShopMenu> {
               ],
             ),
           ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: (){
+            print(widget.uid);
+          },
         ),
       ),
     );
