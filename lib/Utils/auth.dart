@@ -10,39 +10,39 @@ final firestore = FirebaseFirestore.instance;
 // ignore: camel_case_types
 bool newGoogleUser;
 
-class giveUser {
-  giveUser({@required this.uid});
+class GiveUser {
+  GiveUser({@required this.uid});
   final String uid;
 }
 
 abstract class AuthBase {
-  Stream<giveUser> get onAuthStateChanged;
-  Future<giveUser> currentUser();
-  Future<giveUser> signInWithGoogle();
+  Stream<GiveUser> get onAuthStateChanged;
+  Future<GiveUser> currentUser();
+  Future<GiveUser> signInWithGoogle();
   Future<void> signOut();
 
 }
 
 class Auth implements AuthBase {
-  giveUser _userFromFirebase(User user) {
+  GiveUser _userFromFirebase(User user) {
     if (user == null) {
       return null;
     }
-    return giveUser(uid: user.uid);
+    return GiveUser(uid: user.uid);
   }
   @override
-  Stream<giveUser> get onAuthStateChanged {
+  Stream<GiveUser> get onAuthStateChanged {
     return _auth.authStateChanges().map(_userFromFirebase);
   }
 
   @override
-  Future<giveUser> currentUser() async {
+  Future<GiveUser> currentUser() async {
     final user = _auth.currentUser;
     return _userFromFirebase(user);
   }
 
   @override
-  Future<giveUser> signInWithGoogle() async {
+  Future<GiveUser> signInWithGoogle() async {
 
     final googleSignIn = GoogleSignIn();
     final googleAccount = await googleSignIn.signIn();

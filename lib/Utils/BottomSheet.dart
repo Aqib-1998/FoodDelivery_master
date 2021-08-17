@@ -126,11 +126,7 @@ Future<void> displayTextInputDialog(
                       .doc(result.id)
                       .update({whatValue: changedString});
                 });
-
                 onSubmit;
-                // print(changedString);
-                //codeDialog = valueText;
-
                 Navigator.pop(context);
                 _textFieldController.clear();
               },
@@ -141,7 +137,7 @@ Future<void> displayTextInputDialog(
 }
 
 void reviewBottomSheet(
-    context, String address, String mainTitle, String Subtitle) {
+    context, String address, String mainTitle, String subTitle) {
   showModalBottomSheet(
       context: context,
       builder: (builder) {
@@ -167,7 +163,7 @@ void reviewBottomSheet(
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        customRichText(mainTitle, " $Subtitle"),
+                        customRichText(mainTitle, " $subTitle"),
                         Container(
                             height: 44,
                             width: 42,

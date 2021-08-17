@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -11,8 +10,6 @@ import 'package:food_delivery/Utils/CustomRichText.dart';
 import 'package:food_delivery/Utils/auth.dart';
 import 'package:food_delivery/Utils/platform_alert_dialog.dart';
 import 'package:food_delivery/main.dart';
-import 'package:geocoding/geocoding.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'LoginScreen.dart';
 import 'OrderDetailsScreen.dart';
@@ -45,6 +42,7 @@ class _HomePageState extends State<HomePage> {
             ModalRoute.withName('/'));
 
       });
+      phoneController.clear();
     } catch (e) {}
   }
   Future<void> _confirmSignOut(BuildContext context) async {
@@ -83,7 +81,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     getUserInfo();
     setState(() {
-      print(widget.uid);
+      print("user id =======> ${widget.uid}");
     });
     // TODO: implement initState
     super.initState();

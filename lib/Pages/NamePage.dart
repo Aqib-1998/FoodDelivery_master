@@ -41,8 +41,8 @@ class _NamePageState extends State<NamePage> {
                       ScaffoldMessenger.of(context)
                           .showSnackBar(snackBar);
                     }else if(nameController.text.isNotEmpty){
-                      FirebaseFirestore.instance.collection("Shop Users").doc(widget.uid).update({
-                        'Username?' : nameController.text,
+                      FirebaseFirestore.instance.collection("Shop Users").doc(widget.uid).set({
+                        'Username' : nameController.text,
                       }).whenComplete((){
                         Navigator.push(
                           context,

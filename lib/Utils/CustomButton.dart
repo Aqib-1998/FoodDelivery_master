@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hexcolor/hexcolor.dart';
-
 import '../main.dart';
 
 Widget customButton(String text, onPressed){

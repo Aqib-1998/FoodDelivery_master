@@ -9,13 +9,13 @@ final firestore = FirebaseFirestore.instance;
 class AuthBloc {
   final authService = Auth();
   final fb = FacebookLogin();
-  giveUser _userFromFirebase(User user) {
+  GiveUser _userFromFirebase(User user) {
     if (user == null) {
       return null;
     }
-    return giveUser(uid: user.uid);
+    return GiveUser(uid: user.uid);
   }
-  Future<giveUser> currentUser() async {
+  Future<GiveUser> currentUser() async {
     final user = FirebaseAuth.instance.currentUser;
     return _userFromFirebase(user);
   }

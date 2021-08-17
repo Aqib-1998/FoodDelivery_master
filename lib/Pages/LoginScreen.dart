@@ -11,7 +11,7 @@ import 'package:food_delivery/Utils/auth_bloc.dart';
 import 'package:provider/provider.dart';
 import 'EnterOTPScreen.dart';
 final phoneController = TextEditingController();
-final firestore = FirebaseFirestore.instance;
+final fireStore = FirebaseFirestore.instance;
 bool newUserBool ;
 
 class CheckUser extends StatefulWidget {
@@ -28,11 +28,11 @@ class _CheckUserState extends State<CheckUser> {
   Widget build(BuildContext context) {
 
 
-    return StreamBuilder<giveUser>(
+    return StreamBuilder<GiveUser>(
       stream: widget.auth.onAuthStateChanged,
       builder: (context,snapshot){
         if(snapshot.connectionState == ConnectionState.active){
-          giveUser user = snapshot.data;
+          GiveUser user = snapshot.data;
           if(user == null){
             return LoginScreen(
               auth: widget.auth,
@@ -40,19 +40,25 @@ class _CheckUserState extends State<CheckUser> {
           }
           String uid =  FirebaseAuth.instance.currentUser.uid;
           void getData()async{
-            await FirebaseFirestore.instance.collection("Shop Users").doc(uid).get().then((value){
+            await FirebaseFirestore.instance.collection("Shop Users").doc(uid).get().then((value) async {
               newUserBool = value.data()["New user?"];
               print(newUserBool);
+              if(mounted){
               setState(() {
+                print(newUserBool);
               });
+              }
+
             } );
 
           }
           if(newUserBool == null){
-
             getData();
+
             return Container(color: Colors.white,child: Center(child: CircularProgressIndicator()));
+
           }
+
          return newUserBool?CreateShopPage(auth: widget.auth,uid: uid,):HomePage(auth: widget.auth,uid: uid,);
         }else{
           return Scaffold(
@@ -204,15 +210,16 @@ class _LoginScreenState extends State<LoginScreen> {
                                           //     phoneController.text)
                                   ),
                                 );
+
                                 // phoneController.clear();
                               }
-                              if(phoneController.text.length <10 && phoneController.text.length >0){
+                              if(phoneController.text.length <10 && phoneController.text.isNotEmpty){
                                 final snackBar = SnackBar(
                                     content: Text('Please enter a valid Phone no.!'));
 
                                 ScaffoldMessenger.of(context)
                                     .showSnackBar(snackBar);
-                              }else{
+                              }else if(phoneController.text.isEmpty){
                                 final snackBar = SnackBar(
                                     content: Text('Please enter a Phone no!'));
 
