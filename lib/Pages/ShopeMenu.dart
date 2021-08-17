@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:flutter/material.dart';
 import 'package:food_delivery/Pages/EditMenuScreen.dart';
 import 'package:food_delivery/Utils/BackButton.dart';
@@ -241,18 +241,14 @@ class _ShopMenuState extends State<ShopMenu> {
                 customElevatedButton("Add Menu", () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => AddMenu()),
+                    MaterialPageRoute(builder: (context) => AddMenu(uid: widget.uid,)),
                   );
                 }),
               ],
             ),
           ),
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: (){
-            print(widget.uid);
-          },
-        ),
+
       ),
     );
   }

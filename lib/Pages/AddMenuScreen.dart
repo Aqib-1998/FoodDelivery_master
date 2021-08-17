@@ -11,11 +11,13 @@ import 'package:food_delivery/Utils/CustomTextFiled.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
 
-import 'CreateShopPage.dart';
 
 
 String uploadImage='';
 class AddMenu extends StatefulWidget {
+  final String uid;
+
+  const AddMenu({Key key,@required this.uid}) : super(key: key);
   @override
   _AddMenuState createState() => _AddMenuState();
 }
@@ -35,7 +37,7 @@ class _AddMenuState extends State<AddMenu> {
     });
 
     FirebaseStorage storage = FirebaseStorage.instance;
-    Reference ref = storage.ref().child("${getUid.currentUser.uid}'/ $path ");
+    Reference ref = storage.ref().child("${widget.uid}'/ $path ");
     UploadTask uploadTask = ref.putFile(imageFile);
 
     //url = await ref.getDownloadURL();
@@ -102,7 +104,7 @@ class _AddMenuState extends State<AddMenu> {
                   SizedBox(height: 50,),
                   customElevatedButton("Add to Menu",() async {
                     if(menuNameController.text.isNotEmpty && menuQuantityController.text.isNotEmpty && menuAmountController.text.isNotEmpty && uploadImage.isNotEmpty){
-                      await FirebaseFirestore.instance.collection("Shop Users").doc(getUid.currentUser.uid).collection("Shop Menus").add({
+                      await FirebaseFirestore.instance.collection("Shop Users").doc(widget.uid).collection("Shop Menus").add({
                       "Menu Name":menuNameController.text,
                       "Menu Amount":menuAmountController.text,
                       "Menu Quantity":menuQuantityController.text ,

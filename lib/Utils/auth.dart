@@ -58,6 +58,8 @@ class Auth implements AuthBase {
         //to check new user
         firestore.collection("Shop Users").doc(_auth.currentUser.uid).set({
           'New user?' : authResult.additionalUserInfo.isNewUser,
+          'Account Type?': "Google",
+          'Username': authResult.user.displayName
         });
 
         print("New user = ${authResult.additionalUserInfo.isNewUser}");

@@ -39,7 +39,7 @@ class _CheckUserState extends State<CheckUser> {
             );
           }
           String uid =  FirebaseAuth.instance.currentUser.uid;
-          void getdata()async{
+          void getData()async{
             await FirebaseFirestore.instance.collection("Shop Users").doc(uid).get().then((value){
               newUserBool = value.data()["New user?"];
               print(newUserBool);
@@ -50,10 +50,10 @@ class _CheckUserState extends State<CheckUser> {
           }
           if(newUserBool == null){
 
-            getdata();
+            getData();
             return Container(color: Colors.white,child: Center(child: CircularProgressIndicator()));
           }
-         return newUserBool?CreateShopPage(auth: widget.auth):HomePage(auth: widget.auth,uid: uid,);
+         return newUserBool?CreateShopPage(auth: widget.auth,uid: uid,):HomePage(auth: widget.auth,uid: uid,);
         }else{
           return Scaffold(
             body: Center(

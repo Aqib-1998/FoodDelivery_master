@@ -58,25 +58,6 @@ class _HomePageState extends State<HomePage> {
       _signOut();
     }
   }
-  var locationMessage = "";
-  String _currentAddress = "";
-
-  void getCurrentLocation() async{
-    var position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-    var longitude = position.longitude,latitude = position.latitude;
-    List<Placemark> placemarks = await placemarkFromCoordinates(
-        latitude,
-        longitude
-    );
-    Placemark place = placemarks[0];
-
-    setState(() {
-      locationMessage = "$latitude , $longitude";
-      _currentAddress = "${place.street}, ${place.locality},${place.administrativeArea}, ${place.country}";
-      print(locationMessage);
-      print(_currentAddress);
-    });
-  }
 
 
   Future<void> getUserInfo() async {
@@ -508,12 +489,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ],
           ),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () {
-            getUserInfo();
-            getCurrentLocation();
-            }
-          ),
+
         ),
       ),
     );

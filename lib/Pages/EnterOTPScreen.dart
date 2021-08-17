@@ -7,8 +7,6 @@ import 'package:food_delivery/Utils/CustomElevatedButton.dart';
 import 'package:food_delivery/Utils/TopArea.dart';
 import 'package:food_delivery/Utils/auth.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:food_delivery/Pages/HomePage.dart';
-import 'package:food_delivery/main.dart';
 import 'package:pinput/pin_put/pin_put.dart';
 
 class OTPScreen extends StatefulWidget {
@@ -135,8 +133,9 @@ class _OTPScreenState extends State<OTPScreen> {
               .signInWithCredential(credential)
               .then((value) async {
             if (value.user != null) {
-              FirebaseFirestore.instance.collection("Shop Users").doc(FirebaseAuth.instance.currentUser.uid).set({
+              FirebaseFirestore.instance.collection("Shop Users").doc(FirebaseAuth.instance.currentUser.uid).update({
                 'New user?' : value.additionalUserInfo.isNewUser,
+                'Account Type?': "Phone",
               });
 
               Navigator.pushAndRemoveUntil(

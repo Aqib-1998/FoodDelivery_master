@@ -43,6 +43,8 @@ class AuthBloc {
 
           firestore.collection("Shop Users").doc(_auth.currentUser.uid).set({
             'New user?' : result.additionalUserInfo.isNewUser,
+            'Account Type?': "Facebook",
+            'Username': result.user.displayName
           });
 
 
