@@ -211,6 +211,43 @@ class _CreateShopPageState extends State<CreateShopPage> {
                         print(e);
                       });
 
+                      await FirebaseFirestore.instance
+                          .collection("Shop Users")
+                          .doc(widget.uid)
+                          .collection("Shop Reviews")
+                          .add({
+                        //your data which will be added to the collection and collection will be created after this
+                      }).then((_) {
+                        print("Review Collection Created!");
+                      }).catchError((e) {
+                        print(e);
+                      });
+
+                      await FirebaseFirestore.instance
+                          .collection("Shop Users")
+                          .doc(widget.uid)
+                          .collection("Queued Orders")
+                          .add({
+                        //your data which will be added to the collection and collection will be created after this
+                      }).then((_) {
+                        print("Queued Orders Collection Created!");
+                      }).catchError((e) {
+                        print(e);
+                      });
+
+                      await FirebaseFirestore.instance
+                          .collection("Shop Users")
+                          .doc(widget.uid)
+                          .collection("Completed Orders")
+                          .add({
+                        //your data which will be added to the collection and collection will be created after this
+                      }).then((_) {
+                        print("Completed Orders Collection Created!");
+                      }).catchError((e) {
+                        print(e);
+                      });
+
+
                       Navigator.push(context, MaterialPageRoute(builder: (context) => name?NamePage(uid: widget.uid,auth: widget.auth,):HomePage(
                                   auth: widget.auth,
                               uid: widget.uid,

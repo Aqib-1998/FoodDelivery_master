@@ -165,15 +165,16 @@ class _OTPScreenState extends State<OTPScreen> {
               .showSnackBar(SnackBar(content: Text(e.message)));
         },
         codeSent: (String verificationId, int resendToken) {
-          setState(() {
+          if(mounted){setState(() {
             _verificationCode = verificationId;
           });
-        },
+        }},
         codeAutoRetrievalTimeout: (String verificationID) {
-          setState(() {
-            _verificationCode = verificationID;
-          });
-        },
+          if(mounted) {
+            setState(() {
+              _verificationCode = verificationID;
+            });
+          }},
         timeout: Duration(seconds: 60));
   }
 

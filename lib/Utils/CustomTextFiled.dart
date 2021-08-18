@@ -82,11 +82,11 @@ Widget customTextFieldPhoneNo(String hintText, TextInputType textInputType,
         filled: true,
         fillColor: textFieldFillColor,
         hintText: hintText,
-        hintStyle: TextStyle(fontWeight: FontWeight.w400, fontSize: 12),
+        hintStyle: TextStyle(fontWeight: FontWeight.w400, fontSize: 15),
         contentPadding:
             const EdgeInsets.symmetric(vertical: 22.0, horizontal: 16),
         prefixText: "+92 - ",
-        prefixStyle: TextStyle(fontWeight: FontWeight.w400, fontSize: 12),
+        prefixStyle: TextStyle(fontWeight: FontWeight.w400, fontSize: 15),
       ),
     ),
   );

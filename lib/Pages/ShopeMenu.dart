@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:flutter/material.dart';
@@ -129,10 +130,14 @@ class _ShopMenuState extends State<ShopMenu> {
                                       child: ClipRRect(
                                           borderRadius:
                                           BorderRadius.circular(12.0),
-                                          child: Image.network(
-                                            menuImage[index],
+                                          child:  CachedNetworkImage(
+                                            progressIndicatorBuilder: (context, url, downloadProgress) =>
+                                                Center(child: CircularProgressIndicator(value: downloadProgress.progress)),
+                                            imageUrl: menuImage[index],
                                             fit: BoxFit.fill,
-                                          )),
+
+                                          )
+                                      ),
                                     ),
                                     SizedBox(
                                       width: 20,

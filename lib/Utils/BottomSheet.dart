@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:date_format/date_format.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -137,14 +138,13 @@ Future<void> displayTextInputDialog(
 }
 
 void reviewBottomSheet(
-    context, String address, String mainTitle, String subTitle) {
+    context, String mainTitle, String subTitle,String uid) {
   showModalBottomSheet(
       context: context,
       builder: (builder) {
         return Container(
           height: MediaQuery.of(context).size.height / 1.15,
           color: Color(0xFF737373), //could change this to Color(0xFF737373)
-
           child: Container(
               decoration: BoxDecoration(
                   color: Colors.white,
@@ -177,74 +177,92 @@ void reviewBottomSheet(
                       child: Container(
                         width: MediaQuery.of(context).size.width,
                         height: 300,
-                        child: ListView.builder(
-                          itemCount: 10,
-                          itemBuilder: (context, index) {
-                            return Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Container(
-                                width: MediaQuery.of(context).size.width,
-                                height: 125,
-                                child: Card(
-                                  color: customButtonColor,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(15.0),
-                                  ),
-                                  elevation: 4,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(12.0),
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceAround,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.stretch,
-                                      children: [
-                                        SizedBox(
-                                          width: 20,
-                                        ),
-                                        Row(
+                        child: StreamBuilder(
+                          stream: FirebaseFirestore.instance
+                              .collection("Shop Users")
+                              .doc(uid)
+                              .collection('Shop Reviews').snapshots(),
+                          builder: (context, snapshot) {
+                            if(snapshot.connectionState == ConnectionState.waiting){
+                              return Center(child: CircularProgressIndicator(),);
+                            }
+                            if (snapshot.data.docs.length == 0) {
+                              return Center(
+                                child: Text("No Reviews yet!"),
+                              );
+                            }
+                            return ListView.builder(
+                              itemCount: snapshot.data.docs.length,
+                              itemBuilder: (context, index) {
+                                return Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Container(
+                                    width: MediaQuery.of(context).size.width,
+
+                                    child: Card(
+                                      color: customButtonColor,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(15.0),
+                                      ),
+                                      elevation: 4,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(12.0),
+                                        child: Column(
                                           mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
+                                              MainAxisAlignment.spaceAround,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.stretch,
                                           children: [
-                                            Text(
-                                              "John Smith",
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.w600),
+                                            SizedBox(
+                                              width: 20,
                                             ),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                Text(
+                                                  "${snapshot.data.docs[index]["Reviewer name"]}",
+                                                  style: TextStyle(
+                                                      fontWeight: FontWeight.w600),
+                                                ),
+                                                Text(
+                                                  "${formatDate(snapshot.data.docs[index]["Review Date"].toDate(), [dd, '-', M, '-', yyyy])}",
+                                                  style: TextStyle(
+                                                      fontWeight: FontWeight.w200),
+                                                ),
+                                              ],
+                                            ),
+                                            SizedBox(height: 5,),
                                             Text(
-                                              "20-4-2021",
+                                              "${snapshot.data.docs[index]["Review"]}",
                                               style: TextStyle(
                                                   fontWeight: FontWeight.w200),
                                             ),
+                                            SizedBox(height: 5,),
+                                            RatingBar.builder(
+                                              initialRating: double.parse(snapshot.data.docs[index]["Review Rating"].toString()) ,
+                                              itemSize: 16,
+                                              minRating: 1,
+                                              direction: Axis.horizontal,
+                                              allowHalfRating: true,
+                                              itemCount: 5,
+                                              itemPadding: EdgeInsets.symmetric(
+                                                  horizontal: 3.0),
+                                              itemBuilder: (context, _) => Icon(
+                                                Icons.star,
+                                                color: ratingColor,
+                                              ),
+                                              onRatingUpdate: (rating) {},
+                                            ),
                                           ],
                                         ),
-                                        Text(
-                                          "Vegies were fresh",
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w200),
-                                        ),
-                                        RatingBar.builder(
-                                          initialRating: 3,
-                                          itemSize: 16,
-                                          minRating: 1,
-                                          direction: Axis.horizontal,
-                                          allowHalfRating: true,
-                                          itemCount: 5,
-                                          itemPadding: EdgeInsets.symmetric(
-                                              horizontal: 3.0),
-                                          itemBuilder: (context, _) => Icon(
-                                            Icons.star,
-                                            color: ratingColor,
-                                          ),
-                                          onRatingUpdate: (rating) {},
-                                        ),
-                                      ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ),
+                                );
+                              },
                             );
-                          },
+                          }
                         ),
                       ),
                     )

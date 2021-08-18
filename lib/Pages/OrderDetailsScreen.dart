@@ -11,6 +11,13 @@ final firstRowTextStyle = TextStyle(fontSize: 15,fontWeight: FontWeight.bold);
 final rowTextStyle = TextStyle(fontSize: 14,fontWeight: FontWeight.w300);
 
 class OrderDetailsScreen extends StatelessWidget {
+  final String date;
+  final String time;
+  final String address;
+  final String note;
+  final String docId;
+
+  const OrderDetailsScreen({Key key,@required this.date,@required this.time,@required this.address,@required this.note,@required this.docId}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -78,15 +85,19 @@ class OrderDetailsScreen extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Text(
-                              "Date : 20-5-2020",
+                              "Order ID : $docId",
                               style: orderDetailTextStyle,
                             ),
                             Text(
-                              "Time : 12 : 30 a.m",
+                              "Date : $date",
                               style: orderDetailTextStyle,
                             ),
                             Text(
-                              "Address : North Nazimabad",
+                              "Time : $time",
+                              style: orderDetailTextStyle,
+                            ),
+                            Text(
+                              "Address : $address",
                               style: orderDetailTextStyle,
                             ),
                             SizedBox(
@@ -98,7 +109,7 @@ class OrderDetailsScreen extends StatelessWidget {
                             ),
                             Flexible(
                                 child: Text(
-                              "Vegetables must be fresh and neat and clean",
+                              "$note",
                               style: orderDetailTextStyle,
                             )),
                           ],

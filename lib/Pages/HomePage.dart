@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:date_format/date_format.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -215,10 +217,14 @@ class _HomePageState extends State<HomePage> {
                                 ? ClipRRect(
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(8)),
-                                    child: Image.network(
-                                      shopImage,
+                                    child: CachedNetworkImage(
+                                      progressIndicatorBuilder: (context, url, downloadProgress) =>
+                                          Center(child: CircularProgressIndicator(value: downloadProgress.progress)),
+                                      imageUrl: shopImage.toString(),
                                       fit: BoxFit.fill,
-                                    ))
+
+                                    )
+                            )
                                 : Image.asset("lib/Images/background.png"),
                           ),
                           Padding(
@@ -226,17 +232,6 @@ class _HomePageState extends State<HomePage> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
-                                // Container(
-                                //   height: 40,
-                                //   width: 40,
-                                //   decoration: BoxDecoration(
-                                //       shape: BoxShape.circle,
-                                //       image: DecorationImage(
-                                //           image: AssetImage(
-                                //               'lib/Images/dlt_icon.png'),
-                                //           alignment: Alignment.center,
-                                //           fit: BoxFit.cover)),
-                                // ),
                                 SizedBox(
                                   height: 10,
                                 ),
@@ -326,7 +321,7 @@ class _HomePageState extends State<HomePage> {
                       customButton(
                           'Reviews',
                           () => reviewBottomSheet(
-                              context, "Karachi, Pakistan", "Shop", "Reviews")),
+                              context, "Shop", "Reviews",widget.uid)),
                       SizedBox(
                         height: 10,
                       ),
@@ -352,53 +347,83 @@ class _HomePageState extends State<HomePage> {
                       child: Container(
                         width: MediaQuery.of(context).size.width,
                         height: 300,
-                        child: ListView.builder(
-                          itemCount: 3,
-                          itemBuilder: (context, index) {
-                            return Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 8.0, right: 8.0, bottom: 4.0, top: 4.0),
-                              child: Container(
-                                width: MediaQuery.of(context).size.width,
-                                height: 125,
-                                child: Card(
-                                  color: customButtonColor,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(15.0),
-                                  ),
-                                  elevation: 3,
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      Container(
-                                          height: 55,
-                                          child: Image.asset(
-                                              'lib/Images/Cart.png')),
-                                      Padding(
-                                        padding: const EdgeInsets.all(16.0),
-                                        child: Column(
+                        child: StreamBuilder(
+                          stream: FirebaseFirestore.instance
+                              .collection("Shop Users")
+                              .doc(widget.uid)
+                              .collection('Queued Orders').snapshots(),
+                          builder: (context, snapshot) {
+                            if(!snapshot.hasData){
+                              return Center(child: CircularProgressIndicator(),);
+                            }
+                            if (snapshot.data.docs.length == 0) {
+                              return Center(
+                                child: Text("No Order in Queue! "),
+                              );
+                            }
+                            return ListView.builder(
+                              itemCount: snapshot.data.docs.length,
+                              itemBuilder: (context, index) {
+                                return Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 8.0, right: 8.0, bottom: 4.0, top: 4.0),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                OrderDetailsScreen(time: formatDate(snapshot.data.docs[index]["Order Date"].toDate(), [hh, ':', nn, ' ', am]).toString(),
+                                                date: formatDate(snapshot.data.docs[index]["Order Date"].toDate(), [dd, '-', mm, '-', yyyy]).toString(),
+                                                address: snapshot.data.docs[index]["Customer Address"],
+                                                note: snapshot.data.docs[index]["Notes"],
+                                                docId: snapshot.data.docs[index].id,)),
+                                      );
+                                    },
+                                    child: Container(
+                                      width: MediaQuery.of(context).size.width,
+                                      height: 125,
+                                      child: Card(
+                                        color: customButtonColor,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(15.0),
+                                        ),
+                                        elevation: 3,
+                                        child: Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceEvenly,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
                                           children: [
-                                            Text("Ali Haider"),
-                                            Text("10-8-2021"),
-                                            Text("10:30 a.m")
+                                            Container(
+                                                height: 55,
+                                                child: Image.asset(
+                                                    'lib/Images/Cart.png')),
+                                            Padding(
+                                              padding: const EdgeInsets.all(16.0),
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.spaceEvenly,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                children: [
+                                                  Text(snapshot.data.docs[index]["Customer name"]),
+                                                  Text("${formatDate(snapshot.data.docs[index]["Order Date"].toDate(), [dd, '-', mm, '-', yyyy])}"),
+                                                  Text("${formatDate(snapshot.data.docs[index]["Order Date"].toDate(), [hh, ':', nn, ' ', am])}"),
+                                                ],
+                                              ),
+                                            ),
+                                            Container(
+                                                height: 20,
+                                                child: Image.asset(
+                                                    'lib/Images/redclock.png')),
                                           ],
                                         ),
                                       ),
-                                      Container(
-                                          height: 20,
-                                          child: Image.asset(
-                                              'lib/Images/redclock.png')),
-                                    ],
+                                    ),
                                   ),
-                                ),
-                              ),
+                                );
+                              },
                             );
-                          },
+                          }
                         ),
                       ),
                     )
@@ -429,14 +454,14 @@ class _HomePageState extends State<HomePage> {
                               padding: const EdgeInsets.only(
                                   left: 8.0, right: 8.0, bottom: 4.0, top: 4.0),
                               child: GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            OrderDetailsScreen()),
-                                  );
-                                },
+                                // onTap: () {
+                                //   Navigator.push(
+                                //     context,
+                                //     MaterialPageRoute(
+                                //         builder: (context) =>
+                                //             OrderDetailsScreen()),
+                                //   );
+                                // },
                                 child: Container(
                                   width: MediaQuery.of(context).size.width,
                                   height: 125,
