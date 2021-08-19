@@ -11,11 +11,12 @@ final _auth = FirebaseAuth.instance;
 
 void bottomSheet(
     context,
-    String address,
+    String data,
     String mainTitle,
     String subTitle,
-    String dTitle,
-    String dHintText,
+    String alertDialogueTitle,
+    String alertDialogueHintText,
+    String uid,
     dOnChanged,
     dOnSubmit,
     String changedString,
@@ -50,8 +51,9 @@ void bottomSheet(
                           onTap: () {
                             displayTextInputDialog(
                                 context,
-                                dTitle,
-                                dHintText,
+                                alertDialogueTitle,
+                                alertDialogueHintText,
+                                uid,
                                 dOnChanged,
                                 dOnSubmit,
                                 changedString,
@@ -69,12 +71,23 @@ void bottomSheet(
                     ),
                     Padding(
                       padding: const EdgeInsets.only(left: 4.0),
-                      child: Text(
-                        address,
-                        style: TextStyle(
-                            fontWeight: FontWeight.w400,
-                            fontSize: 18,
-                            color: Colors.black54),
+                      child: StreamBuilder(
+                        stream: FirebaseFirestore.instance
+                            .collection("Shop Users")
+                            .doc(uid)
+                            .collection('Shop info').snapshots(),
+                        builder: (context, snapshot) {
+                          if(snapshot.connectionState == ConnectionState.waiting){
+                            return Center(child: CircularProgressIndicator(),);
+                          }
+                          return Text(
+                            snapshot.data.docs[0][data],
+                            style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                fontSize: 18,
+                                color: Colors.black54),
+                          );
+                        }
                       ),
                     )
                   ],
@@ -90,6 +103,7 @@ Future<void> displayTextInputDialog(
     BuildContext context,
     String title,
     String hintText,
+    String uid,
     onChanged,
     onSubmit,
     String changedString,
@@ -103,7 +117,6 @@ Future<void> displayTextInputDialog(
             onChanged: (value) {
               onChanged;
               changedString = value;
-              print(changedString);
             },
             controller: _textFieldController,
             decoration: InputDecoration(hintText: hintText),
@@ -116,16 +129,18 @@ Future<void> displayTextInputDialog(
               onPressed: () async {
                 var docRef = await FirebaseFirestore.instance
                     .collection("Shop Users")
-                    .doc(_auth.currentUser.uid)
+                    .doc(uid)
                     .collection("Shop info")
                     .get();
                 docRef.docs.forEach((result) {
                   FirebaseFirestore.instance
                       .collection('Shop Users')
-                      .doc(firebaseUser.uid)
+                      .doc(uid)
                       .collection("Shop info")
                       .doc(result.id)
                       .update({whatValue: changedString});
+                  print(result.id);
+                  print(uid);
                 });
                 onSubmit;
                 Navigator.pop(context);
