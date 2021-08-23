@@ -11,7 +11,7 @@ import 'package:food_delivery/Utils/auth_bloc.dart';
 import 'package:provider/provider.dart';
 import 'EnterOTPScreen.dart';
 final phoneController = TextEditingController();
-final fireStore = FirebaseFirestore.instance;
+
 bool newUserBool ;
 
 class CheckUser extends StatefulWidget {
@@ -90,7 +90,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  User user;
+
 
   Future<void> _signInWithGoogle() async{
     try {

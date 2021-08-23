@@ -17,8 +17,8 @@ import 'LoginScreen.dart';
 import 'OrderDetailsScreen.dart';
 import 'ShopeMenu.dart';
 
-String shopName, newAddress, newContact;
-var shopImage;
+String  newAddress, newContact;
+
 String url = '';
 
 class HomePage extends StatefulWidget {
@@ -58,26 +58,10 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future<void> getUserInfo() async {
-    print(widget.uid);
-    await FirebaseFirestore.instance
-        .collection('Shop Users')
-        .doc(widget.uid)
-        .collection("Shop info")
-        .get()
-        .then((querySnapshot) {
-      querySnapshot.docs.forEach((result) {
-        shopName = result.data()['Shop Name'];
-        shopImage = result.data()['Shop Image'];
-      });
-    }).whenComplete(() {
-      setState(() {});
-    });
-  }
 
   @override
   void initState() {
-    getUserInfo();
+
     setState(() {
       print("user id =======> ${widget.uid}");
     });
@@ -102,20 +86,11 @@ class _HomePageState extends State<HomePage> {
       url = await res.ref.getDownloadURL();
       print(url);
     }).whenComplete(() async {
-      shopImage = url;
-      var docRef = await FirebaseFirestore.instance
-          .collection("Shop Users")
-          .doc(widget.uid)
-          .collection("Shop info")
-          .get();
-      docRef.docs.forEach((result) {
         FirebaseFirestore.instance
             .collection('Shop Users')
             .doc(widget.uid)
-            .collection("Shop info")
-            .doc(result.id)
             .update({"Shop Image": url});
-      });
+
 
       setState(() {});
     });
@@ -128,6 +103,7 @@ class _HomePageState extends State<HomePage> {
         .doc(widget.uid)
         .collection("New User?")
         .get();
+
     for (int i = 0; i < querySnapshot.docs.length; i++) {
       var a = querySnapshot.docs[i];
       print(a);
@@ -178,136 +154,141 @@ class _HomePageState extends State<HomePage> {
                 child: Padding(
                   padding: const EdgeInsets.only(
                       top: 16, bottom: 8.0, left: 14, right: 14),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      shopName != null
-                          ? Text(
-                              shopName,
-                              style: TextStyle(
-                                  fontSize: 26, fontWeight: FontWeight.w700),
-                            )
-                          : CircularProgressIndicator(),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      Stack(
-                        alignment: Alignment.bottomRight,
-                        children: [
-                          Container(
-                            height: MediaQuery.of(context).size.height / 3.25,
-                            width: MediaQuery.of(context).size.width,
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10)),
-                            ),
-                            child: shopImage != null
-                                ? ClipRRect(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(8)),
-                                    child: CachedNetworkImage(
-                                      progressIndicatorBuilder: (context, url,
-                                              downloadProgress) =>
-                                          Center(
-                                              child: CircularProgressIndicator(
-                                                  value: downloadProgress
-                                                      .progress)),
-                                      imageUrl: shopImage.toString(),
-                                      fit: BoxFit.fill,
-                                    ))
-                                : Image.asset("lib/Images/background.png"),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                SizedBox(
-                                  height: 10,
+                  child: StreamBuilder(
+                    stream: FirebaseFirestore.instance.collection('Shop Users').doc(widget.uid).snapshots(),
+                    builder: (context, snapshot) {
+                      if(snapshot.connectionState == ConnectionState.waiting){
+                        return Center(child: CircularProgressIndicator(),);
+                      }
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+
+                              Text(
+                                  snapshot.data["Shop Name"],
+                                  style: TextStyle(
+                                      fontSize: 26, fontWeight: FontWeight.w700),
                                 ),
-                                InkWell(
-                                  onTap: () {
-                                    chooseImage(ImageSource.gallery);
-                                  },
-                                  child: Container(
-                                    height: 40,
-                                    width: 40,
-                                    decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        image: DecorationImage(
-                                            image: AssetImage(
-                                                'lib/Images/edt_icon.png'),
-                                            alignment: Alignment.center,
-                                            fit: BoxFit.cover)),
-                                  ),
-                                ),
-                              ],
-                            ),
+                          SizedBox(
+                            height: 20,
                           ),
+                          Stack(
+                            alignment: Alignment.bottomRight,
+                            children: [
+                              Container(
+                                height: MediaQuery.of(context).size.height / 3.25,
+                                width: MediaQuery.of(context).size.width,
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: Colors.grey),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10)),
+                                ),
+                                child:ClipRRect(
+                                        borderRadius:
+                                            BorderRadius.all(Radius.circular(8)),
+                                        child: CachedNetworkImage(
+                                          progressIndicatorBuilder: (context, url,
+                                                  downloadProgress) =>
+                                              Center(
+                                                  child: CircularProgressIndicator(
+                                                      value: downloadProgress
+                                                          .progress)),
+                                          imageUrl: snapshot.data["Shop Image"],
+                                          fit: BoxFit.fill,
+                                        )),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    InkWell(
+                                      onTap: () {
+                                        chooseImage(ImageSource.gallery);
+                                      },
+                                      child: Container(
+                                        height: 40,
+                                        width: 40,
+                                        decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            image: DecorationImage(
+                                                image: AssetImage(
+                                                    'lib/Images/edt_icon.png'),
+                                                alignment: Alignment.center,
+                                                fit: BoxFit.cover)),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: 15,
+                          ),
+                          customButton('Shop Menu', () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ShopMenu(
+                                        uid: widget.uid,
+                                      )),
+                            );
+                          }),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          customButton('Shop Address', () {
+                            bottomSheet(
+                                context,
+                                "Shop Address",
+                                "Shop",
+                                "Address",
+                                "Change Address.",
+                                "Enter new Address",
+                                widget.uid, () {
+                              setState(() {});
+                            }, () {
+                              setState(() {
+
+                              });
+                            }, newAddress, "Shop Address");
+                          }),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          customButton('Contact Number', () {
+                            bottomSheet(
+                                context,
+                                "Shop Contact",
+                                "Contact",
+                                "Number",
+                                "Change Contact No.",
+                                "Enter new Contact no.",
+                                widget.uid, () {
+                              setState(() {});
+                            }, () {
+                              setState(() {});
+                            }, newContact, "Shop Contact");
+                          }),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          customButton(
+                              'Reviews',
+                              () => reviewBottomSheet(
+                                  context, "Shop", "Reviews", widget.uid)),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          customButton('Sign Out', () => _confirmSignOut(context)),
                         ],
-                      ),
-                      SizedBox(
-                        height: 15,
-                      ),
-                      customButton('Shop Menu', () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => ShopMenu(
-                                    uid: widget.uid,
-                                  )),
-                        );
-                      }),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      customButton('Shop Address', () {
-                        bottomSheet(
-                            context,
-                            "Shop Address",
-                            "Shop",
-                            "Address",
-                            "Change Address.",
-                            "Enter new Address",
-                            widget.uid, () {
-                          setState(() {});
-                        }, () {
-                          setState(() {
-                            getUserInfo();
-                          });
-                        }, newAddress, "Shop Address");
-                      }),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      customButton('Contact Number', () {
-                        bottomSheet(
-                            context,
-                            "Shop Contact",
-                            "Contact",
-                            "Number",
-                            "Change Contact No.",
-                            "Enter new Contact no.",
-                            widget.uid, () {
-                          setState(() {});
-                        }, () {
-                          setState(() {});
-                        }, newContact, "Shop Contact");
-                      }),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      customButton(
-                          'Reviews',
-                          () => reviewBottomSheet(
-                              context, "Shop", "Reviews", widget.uid)),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      customButton('Sign Out', () => _confirmSignOut(context)),
-                    ],
+                      );
+                    }
                   ),
                 ),
               ),

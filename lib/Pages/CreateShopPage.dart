@@ -16,8 +16,8 @@ import 'package:image_picker/image_picker.dart';
 import 'NamePage.dart';
 
 var imageDir;
-String accType;
-bool name;
+String accType,userName;
+bool name,newUser,buttonEnable;
 String url = '';
 
 class CreateShopPage extends StatefulWidget {
@@ -38,6 +38,8 @@ class _CreateShopPageState extends State<CreateShopPage> {
   Future<void> getAccountType()async{
     await FirebaseFirestore.instance.collection("Shop Users").doc(widget.uid).get().then((value){
       accType = value.data()["Account Type?"];
+      userName = value.data()["Username"];
+      newUser = value.data()["New user?"];
       if(accType == "Facebook" || accType == "Google"){
         name = false;
       }else if(accType == "Phone"){
@@ -183,33 +185,62 @@ class _CreateShopPageState extends State<CreateShopPage> {
                   SizedBox(
                     height: 10,
                   ),
-                  customTextField("Enter Shop Contact Number",
+                  customTextFieldPhoneNo("3333333333  (no 0 at start)",
                       TextInputType.number, shopContactController),
                   SizedBox(
                     height: 10,
                   ),
-                  customElevatedButton("Create Shop", () async {
-                    if (shopContactController.text.isNotEmpty &&
+                  customElevatedButton("Create Shop", buttonEnable?() async {
+
+                    if (shopContactController.text.isNotEmpty && shopContactController.text.length == 10 &&
                         shopAddressController.text.isNotEmpty &&
                         shopNameController.text.isNotEmpty &&
                         url.isNotEmpty) {
-                      await getCurrentLocation();
-                      await FirebaseFirestore.instance
-                          .collection("Shop Users")
-                          .doc(widget.uid)
-                          .collection("Shop info")
-                          .add({
-                        "Shop Name": shopNameController.text,
-                        "Shop Address": shopAddressController.text,
-                        "Shop Contact": shopContactController.text,
-                        "Shop Image": url,
-                        'position': myLocation.data
-                        //your data which will be added to the collection and collection will be created after this
-                      }).then((_) {
-                        print("collection created");
-                      }).catchError((e) {
-                        print(e);
+                      setState(() {
+                        buttonEnable = false;
                       });
+                      await getCurrentLocation();
+                      if(name == false){
+                        await FirebaseFirestore.instance
+                            .collection("Shop Users")
+                            .doc(widget.uid)
+                            .set({
+                          "Shop Name": shopNameController.text,
+                          "Shop Address": shopAddressController.text,
+                          "Shop Contact": shopContactController.text,
+                          "Shop Image": url,
+                          'position': myLocation.data,
+                          "Username": userName,
+                          "Account Type?": accType,
+                          "New user?": newUser
+                          //your data which will be added to the collection and collection will be created after this
+                        }).then((_) {
+                          print("collection created");
+                        }).catchError((e) {
+                          print(e);
+                        });
+                      }
+                      if(name == true){
+                        await FirebaseFirestore.instance
+                            .collection("Shop Users")
+                            .doc(widget.uid)
+                            .set({
+                          "Shop Name": shopNameController.text,
+                          "Shop Address": shopAddressController.text,
+                          "Shop Contact": shopContactController.text,
+                          "Shop Image": url,
+                          "Username": "",
+                          'position': myLocation.data,
+                          "Account Type?": accType,
+                          "New user?": newUser
+                          //your data which will be added to the collection and collection will be created after this
+                        }).then((_) {
+                          print("collection created");
+                        }).catchError((e) {
+                          print(e);
+                        });
+                      }
+
 
                       await FirebaseFirestore.instance
                           .collection("Shop Users")
@@ -221,7 +252,17 @@ class _CreateShopPageState extends State<CreateShopPage> {
                         print("Review Collection Created!");
                       }).catchError((e) {
                         print(e);
-                      });
+                      }).whenComplete(() async {
+                        await FirebaseFirestore.instance
+                            .collection("Shop Users")
+                            .doc(widget.uid)
+                            .collection("Shop Reviews").get().then((snapshot){
+                              for(DocumentSnapshot ds in snapshot.docs){
+                                ds.reference.delete();
+                              }
+                        });
+                      }
+                      );
 
                       await FirebaseFirestore.instance
                           .collection("Shop Users")
@@ -233,6 +274,15 @@ class _CreateShopPageState extends State<CreateShopPage> {
                         print("Queued Orders Collection Created!");
                       }).catchError((e) {
                         print(e);
+                      }).whenComplete(()async{
+                        await FirebaseFirestore.instance
+                            .collection("Shop Users")
+                            .doc(widget.uid)
+                            .collection("Queued Orders").get().then((snapshot){
+                          for(DocumentSnapshot ds in snapshot.docs){
+                            ds.reference.delete();
+                          }
+                        });
                       });
 
                       await FirebaseFirestore.instance
@@ -245,6 +295,16 @@ class _CreateShopPageState extends State<CreateShopPage> {
                         print("Completed Orders Collection Created!");
                       }).catchError((e) {
                         print(e);
+                      }).whenComplete(()async{
+                       await  FirebaseFirestore.instance
+                            .collection("Shop Users")
+                            .doc(widget.uid)
+                            .collection("Completed Orders").get().then((snapshot){
+                          for(DocumentSnapshot ds in snapshot.docs){
+                            ds.reference.delete();
+                          }
+                        });
+
                       });
 
 
@@ -254,11 +314,12 @@ class _CreateShopPageState extends State<CreateShopPage> {
                                 )),
                       );
                     } else {
+
                       final snackBar = SnackBar(
-                          content: Text('Please fill all three fields!'));
+                          content: Text('Please fill all three fields completely!'));
                       ScaffoldMessenger.of(context).showSnackBar(snackBar);
                     }
-                  })
+                  }:null)
                 ],
               ),
             ),
@@ -270,6 +331,7 @@ class _CreateShopPageState extends State<CreateShopPage> {
   @override
   void initState()  {
      getAccountType();
+     buttonEnable =true;
     super.initState();
   }
 }

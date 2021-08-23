@@ -75,13 +75,13 @@ void bottomSheet(
                         stream: FirebaseFirestore.instance
                             .collection("Shop Users")
                             .doc(uid)
-                            .collection('Shop info').snapshots(),
+                            .snapshots(),
                         builder: (context, snapshot) {
                           if(snapshot.connectionState == ConnectionState.waiting){
                             return Center(child: CircularProgressIndicator(),);
                           }
                           return Text(
-                            snapshot.data.docs[0][data],
+                            snapshot.data[data],
                             style: TextStyle(
                                 fontWeight: FontWeight.w400,
                                 fontSize: 18,
@@ -127,21 +127,13 @@ Future<void> displayTextInputDialog(
               textColor: Colors.white,
               child: Text('OK'),
               onPressed: () async {
-                var docRef = await FirebaseFirestore.instance
-                    .collection("Shop Users")
-                    .doc(uid)
-                    .collection("Shop info")
-                    .get();
-                docRef.docs.forEach((result) {
+
                   FirebaseFirestore.instance
                       .collection('Shop Users')
                       .doc(uid)
-                      .collection("Shop info")
-                      .doc(result.id)
                       .update({whatValue: changedString});
-                  print(result.id);
                   print(uid);
-                });
+
                 onSubmit;
                 Navigator.pop(context);
                 _textFieldController.clear();

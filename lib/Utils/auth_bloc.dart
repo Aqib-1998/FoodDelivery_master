@@ -40,12 +40,22 @@ class AuthBloc {
 
         //User Credential to Sign in with Firebase
         final result = await authService.signInWithCredential(credential);
-
+        if(result.additionalUserInfo.isNewUser){
           firestore.collection("Shop Users").doc(_auth.currentUser.uid).set({
             'New user?' : result.additionalUserInfo.isNewUser,
             'Account Type?': "Facebook",
             'Username': result.user.displayName
           });
+
+        }
+
+        if(!result.additionalUserInfo.isNewUser){
+          firestore.collection("Shop Users").doc(_auth.currentUser.uid).update({
+            'New user?' : result.additionalUserInfo.isNewUser,
+            'Account Type?': "Facebook",
+            'Username': result.user.displayName
+          });
+        }
 
 
         print('${result.user.displayName} is now logged in');

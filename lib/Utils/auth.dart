@@ -7,7 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 final _auth = FirebaseAuth.instance;
 final firestore = FirebaseFirestore.instance;
-// ignore: camel_case_types
+
 bool newGoogleUser;
 
 class GiveUser {
@@ -56,11 +56,21 @@ class Auth implements AuthBase {
           ),
         );
         //to check new user
-        firestore.collection("Shop Users").doc(_auth.currentUser.uid).set({
-          'New user?' : authResult.additionalUserInfo.isNewUser,
-          'Account Type?': "Google",
-          'Username': authResult.user.displayName
-        });
+       if(authResult.additionalUserInfo.isNewUser){
+         firestore.collection("Shop Users").doc(_auth.currentUser.uid).set({
+           'New user?' : authResult.additionalUserInfo.isNewUser,
+           'Account Type?': "Google",
+           'Username': authResult.user.displayName
+         });
+       }
+       if(!authResult.additionalUserInfo.isNewUser){
+         firestore.collection("Shop Users").doc(_auth.currentUser.uid).update({
+           'New user?' : authResult.additionalUserInfo.isNewUser,
+           'Account Type?': "Google",
+           'Username': authResult.user.displayName
+         });
+       }
+
 
         print("New user = ${authResult.additionalUserInfo.isNewUser}");
         return _userFromFirebase(authResult.user);

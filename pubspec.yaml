@@ -29,7 +29,6 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   hexcolor: ^2.0.4
-  pin_code_fields: ^7.3.0
   flutter_rating_bar: ^4.0.0
   animated_splash_screen: ^1.1.0
   page_transition: any
