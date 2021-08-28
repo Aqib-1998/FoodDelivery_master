@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 final _auth = FirebaseAuth.instance;
 final firestore = FirebaseFirestore.instance;
 
@@ -55,6 +56,8 @@ class Auth implements AuthBase {
             accessToken: googleAuth.accessToken,
           ),
         );
+        var status = await OneSignal.shared.getPermissionSubscriptionState();
+        String tokenId = status.subscriptionStatus.userId;
         //to check new user
        if(authResult.additionalUserInfo.isNewUser){
          firestore.collection("Shop Users").doc(_auth.currentUser.uid).set({
@@ -67,7 +70,8 @@ class Auth implements AuthBase {
          firestore.collection("Shop Users").doc(_auth.currentUser.uid).update({
            'New user?' : authResult.additionalUserInfo.isNewUser,
            'Account Type?': "Google",
-           'Username': authResult.user.displayName
+           'Username': authResult.user.displayName,
+           'token Id': tokenId
          });
        }
 

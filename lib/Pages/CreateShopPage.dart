@@ -12,6 +12,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geoflutterfire/geoflutterfire.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 import 'NamePage.dart';
 
@@ -19,6 +20,7 @@ var imageDir;
 String accType,userName;
 bool name,newUser,buttonEnable;
 String url = '';
+
 
 class CreateShopPage extends StatefulWidget {
   final auth;
@@ -191,7 +193,9 @@ class _CreateShopPageState extends State<CreateShopPage> {
                     height: 10,
                   ),
                   customElevatedButton("Create Shop", buttonEnable?() async {
-
+                    var status = await OneSignal.shared.getPermissionSubscriptionState();
+                    String tokenId = status.subscriptionStatus.userId;
+                    print(tokenId);
                     if (shopContactController.text.isNotEmpty && shopContactController.text.length == 10 &&
                         shopAddressController.text.isNotEmpty &&
                         shopNameController.text.isNotEmpty &&
@@ -212,7 +216,8 @@ class _CreateShopPageState extends State<CreateShopPage> {
                           'position': myLocation.data,
                           "Username": userName,
                           "Account Type?": accType,
-                          "New user?": newUser
+                          "New user?": newUser,
+                          "token Id": tokenId
                           //your data which will be added to the collection and collection will be created after this
                         }).then((_) {
                           print("collection created");
@@ -232,7 +237,8 @@ class _CreateShopPageState extends State<CreateShopPage> {
                           "Username": "",
                           'position': myLocation.data,
                           "Account Type?": accType,
-                          "New user?": newUser
+                          "New user?": newUser,
+                          "token Id": tokenId
                           //your data which will be added to the collection and collection will be created after this
                         }).then((_) {
                           print("collection created");

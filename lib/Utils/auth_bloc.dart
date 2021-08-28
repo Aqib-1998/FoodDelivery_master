@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_login_facebook/flutter_login_facebook.dart';
 import 'package:food_delivery/Utils/auth.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 final _auth = FirebaseAuth.instance;
 final firestore = FirebaseFirestore.instance;
@@ -40,6 +41,8 @@ class AuthBloc {
 
         //User Credential to Sign in with Firebase
         final result = await authService.signInWithCredential(credential);
+        var status = await OneSignal.shared.getPermissionSubscriptionState();
+        String tokenId = status.subscriptionStatus.userId;
         if(result.additionalUserInfo.isNewUser){
           firestore.collection("Shop Users").doc(_auth.currentUser.uid).set({
             'New user?' : result.additionalUserInfo.isNewUser,
@@ -53,7 +56,8 @@ class AuthBloc {
           firestore.collection("Shop Users").doc(_auth.currentUser.uid).update({
             'New user?' : result.additionalUserInfo.isNewUser,
             'Account Type?': "Facebook",
-            'Username': result.user.displayName
+            'Username': result.user.displayName,
+            "token Id": tokenId
           });
         }
 

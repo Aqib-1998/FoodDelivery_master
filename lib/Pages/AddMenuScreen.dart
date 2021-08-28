@@ -106,7 +106,7 @@ class _AddMenuState extends State<AddMenu> {
                     if(menuNameController.text.isNotEmpty && menuQuantityController.text.isNotEmpty && menuAmountController.text.isNotEmpty && uploadImage.isNotEmpty){
                       await FirebaseFirestore.instance.collection("Shop Users").doc(widget.uid).collection("Shop Menus").add({
                       "Menu Name":menuNameController.text,
-                      "Menu Amount":menuAmountController.text,
+                      "Menu Amount": menuAmountController.text,
                       "Menu Quantity":menuQuantityController.text ,
                       "Menu Image": uploadImage//your data which will be added to the collection and collection will be created after this
                     }).then((_){
