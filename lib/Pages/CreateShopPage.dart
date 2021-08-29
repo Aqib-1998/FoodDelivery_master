@@ -58,7 +58,7 @@ class _CreateShopPageState extends State<CreateShopPage> {
   final geo = Geoflutterfire();
   GeoFirePoint myLocation;
   Future getCurrentLocation() async {
-    var position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    var position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.bestForNavigation);
     var longitude = position.longitude, latitude = position.latitude;
     List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
     Placemark place = placemarks[0];
@@ -216,7 +216,7 @@ class _CreateShopPageState extends State<CreateShopPage> {
                           'position': myLocation.data,
                           "Username": userName,
                           "Account Type?": accType,
-                          "New user?": newUser,
+                          "New user?": false,
                           "token Id": tokenId
                           //your data which will be added to the collection and collection will be created after this
                         }).then((_) {
@@ -237,7 +237,7 @@ class _CreateShopPageState extends State<CreateShopPage> {
                           "Username": "",
                           'position': myLocation.data,
                           "Account Type?": accType,
-                          "New user?": newUser,
+                          "New user?": false,
                           "token Id": tokenId
                           //your data which will be added to the collection and collection will be created after this
                         }).then((_) {
