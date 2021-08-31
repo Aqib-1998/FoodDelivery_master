@@ -193,9 +193,9 @@ class _CreateShopPageState extends State<CreateShopPage> {
                     height: 10,
                   ),
                   customElevatedButton("Create Shop", buttonEnable?() async {
-                    var status = await OneSignal.shared.getPermissionSubscriptionState();
-                    String tokenId = status.subscriptionStatus.userId;
-                    print(tokenId);
+                    // var status = await OneSignal.shared.getPermissionSubscriptionState();
+                    // String tokenId = status.subscriptionStatus.userId;
+                    print(1);
                     if (shopContactController.text.isNotEmpty && shopContactController.text.length == 10 &&
                         shopAddressController.text.isNotEmpty &&
                         shopNameController.text.isNotEmpty &&
@@ -217,7 +217,7 @@ class _CreateShopPageState extends State<CreateShopPage> {
                           "Username": userName,
                           "Account Type?": accType,
                           "New user?": false,
-                          "token Id": tokenId
+                          "token Id": 1
                           //your data which will be added to the collection and collection will be created after this
                         }).then((_) {
                           print("collection created");
@@ -238,7 +238,7 @@ class _CreateShopPageState extends State<CreateShopPage> {
                           'position': myLocation.data,
                           "Account Type?": accType,
                           "New user?": false,
-                          "token Id": tokenId
+                          "token Id": 1
                           //your data which will be added to the collection and collection will be created after this
                         }).then((_) {
                           print("collection created");

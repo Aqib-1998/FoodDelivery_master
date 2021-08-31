@@ -299,7 +299,6 @@ class OrderDetailsScreen extends StatelessWidget {
       ),
     );
   }
-
 }
 
 class MapUtils {
@@ -315,7 +314,7 @@ class MapUtils {
     }
   }
 }
-
+String appId = "ebb451e6-249d-4e68-9b16-7a04100a8edb";
 Future<Response> sendNotification(List<String> tokenIdList, String contents, String heading) async{
 
   return await post(

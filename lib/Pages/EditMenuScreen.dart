@@ -20,7 +20,8 @@ bool newImage = false;
 
 
 class EditMenu extends StatefulWidget {
-  final String menuName,menuAmount,menuQuantity,menuImage,docId;
+  final String menuName,menuQuantity,menuImage,docId;
+  final int menuAmount;
 
   const EditMenu({Key key, @required this.menuName, this.menuAmount, this.menuQuantity, this.menuImage, this.docId}) : super(key: key);
 
@@ -67,6 +68,10 @@ class _EditMenuState extends State<EditMenu> {
     });
     print(uploadEditedImage);
   }
+  int price;
+  List<int> priceList = [10,15,20,25,30,35,40,45,50,60,70,80,90,100];
+  String quantityUnit;
+  List<String> quantityUnitList = ['Kg','Bundle'];
 
   Widget build(BuildContext context) {
     return SafeArea(
@@ -111,18 +116,28 @@ class _EditMenuState extends State<EditMenu> {
                   SizedBox(height: 10,),
                   customTextField("${widget.menuName}",TextInputType.text,menuNameController),
                   SizedBox(height: 10,),
-                  customTextField("${widget.menuAmount}",TextInputType.number,menuAmountController),
-                  SizedBox(height: 10,),
-                  customTextField("${widget.menuQuantity}",TextInputType.number,menuQuantityController),
+                  customPriceDropDown(priceList, price, (newValue){
+                    setState(() {
+                      price = newValue;
+                    });
+                  }),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  customQuantityUnitDropDown(quantityUnitList, quantityUnit, (newValue){
+                    setState(() {
+                      quantityUnit = newValue;
+                    });
+                  }),
                   SizedBox(height: 50,),
                   customElevatedButton("Done",() async {
 
-                    if(menuNameController.text.isNotEmpty && menuQuantityController.text.isNotEmpty && menuAmountController.text.isNotEmpty){
+                    if(menuNameController.text.isNotEmpty && price !=null && quantityUnit !=null){
                       await ref.doc(widget.docId).update({
                         "Menu Name":menuNameController.text,
-                        "Menu Amount":menuAmountController.text,
-                        "Menu Quantity":menuQuantityController.text ,
-                        "Menu Image": newImage?uploadEditedImage??widget.menuImage:widget.menuImage//your data which will be added to the collection and collection will be created after this
+                        "Menu Amount":price,
+                        "Menu Quantity":quantityUnit ,
+                        "Menu Image": newImage?uploadEditedImage:widget.menuImage//your data which will be added to the collection and collection will be created after this
                       }).then((_){
                         final snackBar = SnackBar(content: Text('Menu edited!'));
                         ScaffoldMessenger.of(context).showSnackBar(snackBar);

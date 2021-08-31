@@ -72,10 +72,10 @@ class _ShopMenuState extends State<ShopMenu> {
                             .collection('Shop Menus').snapshots(),
                         builder: (context, snapshot) {
                           List<String> menuName = [],
-                              menuAmount = [],
                               menuQuantity = [],
                               menuImage = [],
                               docId = [];
+                          List<int>  menuAmount = [];
 
                           if (!snapshot.hasData) {
                             return Center(
@@ -153,7 +153,7 @@ class _ShopMenuState extends State<ShopMenu> {
                                           style: titleStyle,
                                         ),
                                         Text(
-                                          "${menuAmount[index]} Rs. per ${menuQuantity[index]} kg",
+                                          "${menuAmount[index]} Rs. per ${menuQuantity[index]}",
                                           style:subTitleStyle,
                                         ),
                                         Row(

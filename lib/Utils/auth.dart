@@ -56,14 +56,14 @@ class Auth implements AuthBase {
             accessToken: googleAuth.accessToken,
           ),
         );
-        var status = await OneSignal.shared.getPermissionSubscriptionState();
-        String tokenId = status.subscriptionStatus.userId;
+
         //to check new user
        if(authResult.additionalUserInfo.isNewUser){
          firestore.collection("Shop Users").doc(_auth.currentUser.uid).set({
            'New user?' : authResult.additionalUserInfo.isNewUser,
            'Account Type?': "Google",
-           'Username': authResult.user.displayName
+           'Username': authResult.user.displayName,
+           'token Id' :""
          });
        }
        if(!authResult.additionalUserInfo.isNewUser){
@@ -71,7 +71,7 @@ class Auth implements AuthBase {
            'New user?' : authResult.additionalUserInfo.isNewUser,
            'Account Type?': "Google",
            'Username': authResult.user.displayName,
-           'token Id': tokenId
+           'token Id' :""
          });
        }
 

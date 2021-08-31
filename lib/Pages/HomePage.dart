@@ -13,14 +13,14 @@ import 'package:food_delivery/Utils/auth.dart';
 import 'package:food_delivery/Utils/platform_alert_dialog.dart';
 import 'package:food_delivery/main.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'LoginScreen.dart';
 import 'OrderDetailsScreen.dart';
 import 'ShopeMenu.dart';
 
 String newAddress, newContact;
-
 String url = '';
-
+String tokenId ;
 class HomePage extends StatefulWidget {
   final AuthBase auth;
   final String uid;
@@ -54,16 +54,42 @@ class _HomePageState extends State<HomePage> {
       cancelActionText: 'Cancel',
     ).show(context);
     if (didRequestSignOut == true) {
+      OneSignal.shared.disablePush(true);
       _signOut();
     }
   }
+  String appId = "ebb451e6-249d-4e68-9b16-7a04100a8edb";
+  String _debugLabelString = "";
+  Future<void> initOneSignal(BuildContext context) async {
+    await OneSignal.shared.setAppId(appId);
+    final status = await OneSignal.shared.getDeviceState();
+    final String osUserID = status.userId;
+    tokenId = osUserID;
+    print("user id ==========================> $osUserID");
+    
+    FirebaseFirestore.instance.collection("Shop Users").doc(widget.uid).update({
+      'token Id': tokenId
+    });
+    OneSignal.shared.setNotificationWillShowInForegroundHandler((OSNotificationReceivedEvent event) {
+      print('FOREGROUND HANDLER CALLED WITH: $event');
+      /// Display Notification, send null to not display
+      event.complete(event.notification);
+
+      this.setState(() {
+        _debugLabelString = "Notification received in foreground notification: \n${event.notification.jsonRepresentation().replaceAll("\\n", "\n")}";
+      });
+    });
+  }
+
 
   @override
   void initState() {
     setState(() {
       print("user id =======> ${widget.uid}");
     });
-    // TODO: implement initState
+    initOneSignal(context);
+    OneSignal.shared.disablePush(false);
+    print(tokenId);
     super.initState();
   }
 

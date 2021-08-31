@@ -41,13 +41,12 @@ class AuthBloc {
 
         //User Credential to Sign in with Firebase
         final result = await authService.signInWithCredential(credential);
-        var status = await OneSignal.shared.getPermissionSubscriptionState();
-        String tokenId = status.subscriptionStatus.userId;
         if(result.additionalUserInfo.isNewUser){
           firestore.collection("Shop Users").doc(_auth.currentUser.uid).set({
             'New user?' : result.additionalUserInfo.isNewUser,
             'Account Type?': "Facebook",
-            'Username': result.user.displayName
+            'Username': result.user.displayName,
+            'token Id' :""
           });
 
         }
@@ -57,7 +56,7 @@ class AuthBloc {
             'New user?' : result.additionalUserInfo.isNewUser,
             'Account Type?': "Facebook",
             'Username': result.user.displayName,
-            "token Id": tokenId
+            'token Id' :""
           });
         }
 

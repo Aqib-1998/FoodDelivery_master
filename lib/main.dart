@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:food_delivery/Utils/auth.dart';
 import 'package:food_delivery/Utils/auth_bloc.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:onesignal_flutter/onesignal_flutter.dart';
+
 import 'package:provider/provider.dart';
 import 'Pages/LoginScreen.dart';
 import 'package:page_transition/page_transition.dart';
@@ -15,7 +15,7 @@ Color ratingColor = HexColor('#FFD200');
 Color textFieldColor = HexColor('#DEDEDE');
 Color textFieldFillColor = HexColor('#e6e6e6');
 Color totalFieldColor =HexColor('#C4C4C4');
-String appId = "ebb451e6-249d-4e68-9b16-7a04100a8edb";
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -32,12 +32,9 @@ class _MyAppState extends State<MyApp> {
 
   void initState() {
     super.initState();
-    configOneSignal();
   }
-  void configOneSignal()
-  {
-    OneSignal.shared.init(appId);
-  }
+
+
 
   Widget build(BuildContext context) {
     return Provider(

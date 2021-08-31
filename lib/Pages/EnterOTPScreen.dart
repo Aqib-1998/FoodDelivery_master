@@ -121,12 +121,14 @@ class _OTPScreenState extends State<OTPScreen> {
         FirebaseFirestore.instance.collection("Shop Users").doc(value.user.uid).set({
           'New user?' : value.additionalUserInfo.isNewUser,
           'Account Type?': "Phone",
+          'token Id' :""
         });
         }
         if(!value.additionalUserInfo.isNewUser){
           FirebaseFirestore.instance.collection("Shop Users").doc(value.user.uid).update({
             'New user?' : value.additionalUserInfo.isNewUser,
             'Account Type?': "Phone",
+            'token Id' :""
           });
           print(value.user.uid);
         }
@@ -150,6 +152,7 @@ class _OTPScreenState extends State<OTPScreen> {
                 FirebaseFirestore.instance.collection("Shop Users").doc(value.user.uid).set({
                   'New user?' : value.additionalUserInfo.isNewUser,
                   'Account Type?': "Phone",
+                  'token Id' :""
                 });
               Navigator.pushAndRemoveUntil(
                   context,

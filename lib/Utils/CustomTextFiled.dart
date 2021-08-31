@@ -91,3 +91,81 @@ Widget customTextFieldPhoneNo(String hintText, TextInputType textInputType,
     ),
   );
 }
+
+
+Widget customPriceDropDown(List<int> list,int price,void function(price) ){
+  return  InputDecorator(
+    decoration:InputDecoration(
+        border:outlineBorder,
+        focusedBorder: outlineBorder,
+        enabledBorder: outlineBorder,
+        errorBorder: outlineBorder,
+        disabledBorder:outlineBorder,
+        filled: true,
+        fillColor:textFieldFillColor ,
+        hintText: "Select Price",
+        hintStyle: TextStyle(fontWeight: FontWeight.w400, fontSize: 12),
+        contentPadding:
+        const EdgeInsets.symmetric(vertical: 22.0, horizontal: 16)),
+    child: DropdownButtonHideUnderline(
+      child: DropdownButton<int>(
+        // value: gender,
+        isDense: true,
+        isExpanded: true,
+        items: list.map((int value) {
+          return DropdownMenuItem<int>(
+            value: value,
+            child: Text(value.toString()),
+          );
+        }).toList(),
+        hint: Text("Select Price",style: TextStyle(fontWeight: FontWeight.w400, fontSize: 12)),
+        style: TextStyle(fontWeight: FontWeight.w400, fontSize: 15,color: Colors.black),
+        onChanged: (newValue) {
+          function(newValue);
+          price = newValue;
+        },
+        value: price,
+      ),
+    ),
+  );
+}
+
+
+
+
+Widget customQuantityUnitDropDown(List<String> list,String unit,void function(unit) ){
+  return  InputDecorator(
+    decoration:InputDecoration(
+        border:outlineBorder,
+        focusedBorder: outlineBorder,
+        enabledBorder: outlineBorder,
+        errorBorder: outlineBorder,
+        disabledBorder:outlineBorder,
+        filled: true,
+        fillColor:textFieldFillColor ,
+        hintText: "Select Unit",
+        hintStyle: TextStyle(fontWeight: FontWeight.w400, fontSize: 12),
+        contentPadding:
+        const EdgeInsets.symmetric(vertical: 22.0, horizontal: 16)),
+    child: DropdownButtonHideUnderline(
+      child: DropdownButton<String>(
+        // value: gender,
+        isDense: true,
+        isExpanded: true,
+        items: list.map((String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(value.toString()),
+          );
+        }).toList(),
+        hint: Text("Select Unit",style: TextStyle(fontWeight: FontWeight.w400, fontSize: 12)),
+        style: TextStyle(fontWeight: FontWeight.w400, fontSize: 15,color: Colors.black),
+        onChanged: (newValue) {
+          function(newValue);
+          unit = newValue;
+        },
+        value: unit,
+      ),
+    ),
+  );
+}
