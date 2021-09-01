@@ -66,10 +66,13 @@ class _HomePageState extends State<HomePage> {
     final String osUserID = status.userId;
     tokenId = osUserID;
     print("user id ==========================> $osUserID");
-    
-    FirebaseFirestore.instance.collection("Shop Users").doc(widget.uid).update({
-      'token Id': tokenId
-    });
+
+      await FirebaseFirestore.instance.collection("Shop Users").doc(widget.uid).update({
+        'token Id': osUserID
+      });
+
+
+
     OneSignal.shared.setNotificationWillShowInForegroundHandler((OSNotificationReceivedEvent event) {
       print('FOREGROUND HANDLER CALLED WITH: $event');
       /// Display Notification, send null to not display
@@ -81,14 +84,14 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-
   @override
   void initState() {
     setState(() {
       print("user id =======> ${widget.uid}");
     });
-    initOneSignal(context);
     OneSignal.shared.disablePush(false);
+    initOneSignal(context);
+
     print(tokenId);
     super.initState();
   }
@@ -119,6 +122,7 @@ class _HomePageState extends State<HomePage> {
     });
     print(url);
   }
+
 
   Future getDocs() async {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
@@ -368,7 +372,7 @@ class _HomePageState extends State<HomePage> {
                                         List<String> productName = [], productNote = [];
                                         List<int> productKg = [], productPao = [],productPrice=[];
                                         String orderId = snapshot.data.docs[index].id;
-                                        String customerTokenId = snapshot.data.docs[index]["Customer token Id"];
+                                        String customerTokenId = snapshot.data.docs[index]["Customer TokenId"];
                                         String customerName = snapshot.data.docs[index]["Customer Name"];
                                         for (int i = 0; i < snapshot.data.docs[index]['Product Name'].length; i++) {
                                           productName.add(snapshot.data.docs[index]['Product Name'][i]);
@@ -377,6 +381,7 @@ class _HomePageState extends State<HomePage> {
                                           productPao.add(snapshot.data.docs[index]['pao'][i]);
                                           productPrice.add(snapshot.data.docs[index]['Product Price'][i]);
                                         }
+
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:food_delivery/Utils/BackButton.dart';
 import 'package:food_delivery/Utils/CustomElevatedButton.dart';
 import 'package:food_delivery/Utils/CustomRichText.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart';
 import '../main.dart';
@@ -282,7 +283,10 @@ class OrderDetailsScreen extends StatelessWidget {
                             .collection("Shop Users")
                             .doc(uid)
                             .collection("Queued Orders").doc(orderId).delete().whenComplete(() async{
-                          sendNotification([customerTokenId], "Your order has been finished! Please review the Shop", "notification");
+
+
+
+                        sendNotification([customerTokenId], "Your order has been finished! Please review the Shop", "notification");
                           final snackBar = SnackBar(
                             content: Text('Order has been marked as completed!'),duration: Duration(seconds: 1),);
                           ScaffoldMessenger.of(context).showSnackBar(snackBar);
