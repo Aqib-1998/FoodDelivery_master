@@ -217,7 +217,7 @@ class _CreateShopPageState extends State<CreateShopPage> {
                           "Username": userName,
                           "Account Type?": accType,
                           "New user?": false,
-                          "token Id": 1
+                          "token Id": ""
                           //your data which will be added to the collection and collection will be created after this
                         }).then((_) {
                           print("collection created");
@@ -238,7 +238,7 @@ class _CreateShopPageState extends State<CreateShopPage> {
                           'position': myLocation.data,
                           "Account Type?": accType,
                           "New user?": false,
-                          "token Id": 1
+                          "token Id": ""
                           //your data which will be added to the collection and collection will be created after this
                         }).then((_) {
                           print("collection created");

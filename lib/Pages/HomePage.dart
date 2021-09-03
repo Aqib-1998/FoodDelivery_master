@@ -62,11 +62,9 @@ class _HomePageState extends State<HomePage> {
   String _debugLabelString = "";
   Future<void> initOneSignal(BuildContext context) async {
     await OneSignal.shared.setAppId(appId);
-    final status = await OneSignal.shared.getDeviceState().then((value) async {
-     final String osUserID = value.userId;
-     await FirebaseFirestore.instance.collection("Shop Users").doc(widget.uid).update({
-             'token Id': osUserID
-           });
+    final status = await OneSignal.shared.getDeviceState();
+    FirebaseFirestore.instance.collection("Shop Users").doc(widget.uid).update({
+      'token Id': status.userId
     });
 
     OneSignal.shared.setNotificationWillShowInForegroundHandler((OSNotificationReceivedEvent event) {
@@ -77,6 +75,13 @@ class _HomePageState extends State<HomePage> {
       this.setState(() {
         _debugLabelString = "Notification received in foreground notification: \n${event.notification.jsonRepresentation().replaceAll("\\n", "\n")}";
       });
+
+    });
+    OneSignal.shared.setSubscriptionObserver((OSSubscriptionStateChanges changes)  {
+      print("token id =======>> ${status.userId}");
+      FirebaseFirestore.instance.collection("Shop Users").doc(widget.uid).update({
+          'token Id': changes.to.userId
+        });
 
     });
 
@@ -91,9 +96,6 @@ class _HomePageState extends State<HomePage> {
     });
     OneSignal.shared.disablePush(false);
     initOneSignal(context);
-    setState(() {
-
-    });
     print(tokenId);
     super.initState();
   }
@@ -269,6 +271,7 @@ class _HomePageState extends State<HomePage> {
                               height: 15,
                             ),
                             customButton('Shop Menu', () {
+                              initOneSignal(context);
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
