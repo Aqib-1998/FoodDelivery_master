@@ -17,9 +17,9 @@ final rowTextStyle = TextStyle(fontSize: 14, fontWeight: FontWeight.w300);
 
 class OrderDetailsScreen extends StatelessWidget {
   final String date;
-  final String time, customerName;
+  final String time, customerName,customerId,shopName,shopTokenId;
   final String address, customerTokenId, uid;
-  final List<String> productNote, productName;
+  final List<String> productNote, productName,productUnit;
   final List<int> productKg, productPao, productPrice;
   final String orderId;
   final double total;
@@ -36,7 +36,7 @@ class OrderDetailsScreen extends StatelessWidget {
     @required this.productKg,
     @required this.productPao, @required this.total, @required this.lat,
     @required this.long, @required this.productPrice, @required this.customerTokenId,
-    @required this.uid,@required this.customerName,@required this.showButton})
+    @required this.uid,@required this.customerName,@required this.showButton,@required this.customerId,@required this.productUnit,@required this.shopName,@required this.shopTokenId})
       : super(key: key);
 
   @override
@@ -264,25 +264,53 @@ class OrderDetailsScreen extends StatelessWidget {
                     SizedBox(height: 10,),
                     showButton?customElevatedButton("Mark as complete", () async {
                       await FirebaseFirestore.instance.collection('Shop Users')
-                          .doc(uid).collection('Completed Orders')
-                          .add({
+                          .doc(uid).collection('Completed Orders').doc(orderId).
+                          set({
                         'Customer Name':customerName,
-                        'location': address,
+                        'Customer TokenId' : customerTokenId,
+                        'Customer Id' : customerId,
+                        'location':address,
                         'Product Name': productName,
                         'Product Note': productNote,
                         'Product Price': productPrice,
+                        'Product Unit': productUnit,
                         'kg': productKg,
-                        'pao': productPao,
-                        'Total Price': total,
-                        'TimeStamp': DateTime.now(),
-                        'lat': lat,
+                        'pao' : productPao,
+                        'Total Price':total,
+                        'TimeStamp' : DateTime.now(),
+                        'lat' : lat,
                         'long': long,
-                        'Customer token Id': customerTokenId
+                        'Order Id': orderId
                       }).whenComplete(()async{
-                        FirebaseFirestore.instance
+                       await FirebaseFirestore.instance
                             .collection("Shop Users")
                             .doc(uid)
                             .collection("Queued Orders").doc(orderId).delete().whenComplete(() async{
+                          FirebaseFirestore.instance
+                              .collection("Users")
+                              .doc(customerId)
+                              .collection("Queued Orders").doc(orderId).delete().whenComplete((){
+                            FirebaseFirestore.instance
+                                .collection("Users")
+                                .doc(customerId)
+                                .collection("Completed Orders").doc(orderId).set({
+                              'Shop Name':shopName,
+                              'Shop TokenId':shopTokenId,
+                              'Shop Id':uid,
+                              'Order Id':orderId,
+                              'location':address,
+                              'Product Name': productName,
+                              'Product Note': productNote,
+                              'Product Price': productPrice,
+                              'Product Unit': productUnit,
+                              'kg': productKg,
+                              'pao' : productPao,
+                              'Total Price': total,
+                              'TimeStamp' : DateTime.now(),
+
+                                });
+                          });
+
 
 
 

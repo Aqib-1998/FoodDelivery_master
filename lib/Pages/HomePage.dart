@@ -20,7 +20,7 @@ import 'ShopeMenu.dart';
 
 String newAddress, newContact;
 String url = '';
-String tokenId ;
+String tokenId,shopName ;
 class HomePage extends StatefulWidget {
   final AuthBase auth;
   final String uid;
@@ -62,16 +62,12 @@ class _HomePageState extends State<HomePage> {
   String _debugLabelString = "";
   Future<void> initOneSignal(BuildContext context) async {
     await OneSignal.shared.setAppId(appId);
-    final status = await OneSignal.shared.getDeviceState();
-    final String osUserID = status.userId;
-    tokenId = osUserID;
-    print("user id ==========================> $osUserID");
-
-      await FirebaseFirestore.instance.collection("Shop Users").doc(widget.uid).update({
-        'token Id': osUserID
-      });
-
-
+    final status = await OneSignal.shared.getDeviceState().then((value) async {
+     final String osUserID = value.userId;
+     await FirebaseFirestore.instance.collection("Shop Users").doc(widget.uid).update({
+             'token Id': osUserID
+           });
+    });
 
     OneSignal.shared.setNotificationWillShowInForegroundHandler((OSNotificationReceivedEvent event) {
       print('FOREGROUND HANDLER CALLED WITH: $event');
@@ -81,8 +77,12 @@ class _HomePageState extends State<HomePage> {
       this.setState(() {
         _debugLabelString = "Notification received in foreground notification: \n${event.notification.jsonRepresentation().replaceAll("\\n", "\n")}";
       });
+
     });
+
   }
+
+
 
   @override
   void initState() {
@@ -91,7 +91,9 @@ class _HomePageState extends State<HomePage> {
     });
     OneSignal.shared.disablePush(false);
     initOneSignal(context);
+    setState(() {
 
+    });
     print(tokenId);
     super.initState();
   }
@@ -136,6 +138,7 @@ class _HomePageState extends State<HomePage> {
       print(a);
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -193,12 +196,13 @@ class _HomePageState extends State<HomePage> {
                             child: CircularProgressIndicator(),
                           );
                         }
+                        shopName = snapshot.data["Shop Name"];
                         return Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             Text(
-                              snapshot.data["Shop Name"],
+                              shopName ,
                               style: TextStyle(
                                   fontSize: 26, fontWeight: FontWeight.w700),
                             ),
@@ -369,17 +373,19 @@ class _HomePageState extends State<HomePage> {
                                         top: 4.0),
                                     child: GestureDetector(
                                       onTap: () {
-                                        List<String> productName = [], productNote = [];
+                                        List<String> productName = [], productNote = [],productUnit= [];
                                         List<int> productKg = [], productPao = [],productPrice=[];
                                         String orderId = snapshot.data.docs[index].id;
                                         String customerTokenId = snapshot.data.docs[index]["Customer TokenId"];
                                         String customerName = snapshot.data.docs[index]["Customer Name"];
+                                        String customerId = snapshot.data.docs[index]["Customer Id"];
                                         for (int i = 0; i < snapshot.data.docs[index]['Product Name'].length; i++) {
                                           productName.add(snapshot.data.docs[index]['Product Name'][i]);
                                           productNote.add(snapshot.data.docs[index]['Product Note'][i]);
                                           productKg.add(snapshot.data.docs[index]['kg'][i]);
                                           productPao.add(snapshot.data.docs[index]['pao'][i]);
                                           productPrice.add(snapshot.data.docs[index]['Product Price'][i]);
+                                          productUnit.add(snapshot.data.docs[index]['Product Unit'][i]);
                                         }
 
                                         Navigator.push(
@@ -397,13 +403,16 @@ class _HomePageState extends State<HomePage> {
                                                     productKg: productKg,
                                                     productPao: productPao,
                                                     productPrice: productPrice,
+                                                    productUnit: productUnit,
                                                     total: snapshot.data.docs[index]["Total Price"],
                                                     long: snapshot.data.docs[index]["long"] ,
                                                     lat: snapshot.data.docs[index]["lat"],
                                                     customerTokenId: customerTokenId,
                                                     uid: widget.uid,
                                                     customerName: customerName,
-                                                    showButton: true,
+                                                    shopTokenId: tokenId,
+                                                    shopName: shopName,
+                                                    showButton: true, customerId: customerId,
                                                   )),
                                         );
                                       },
@@ -521,17 +530,19 @@ class _HomePageState extends State<HomePage> {
                                         top: 4.0),
                                     child: GestureDetector(
                                       onTap: () {
-                                        List<String> productName = [], productNote = [];
+                                        List<String> productName = [], productNote = [],productUnit=[];
                                         List<int> productKg = [], productPao = [],productPrice=[];
-                                        String orderId = snapshot.data.docs[index].id;
-                                        String customerTokenId = snapshot.data.docs[index]["Customer token Id"];
+                                        String orderId = snapshot.data.docs[index]["Order Id"];
+                                        String customerTokenId = snapshot.data.docs[index]["Customer TokenId"];
                                         String customerName = snapshot.data.docs[index]["Customer Name"];
+                                        String customerId = snapshot.data.docs[index]["Customer Id"];
                                         for (int i = 0; i < snapshot.data.docs[index]['Product Name'].length; i++) {
                                           productName.add(snapshot.data.docs[index]['Product Name'][i]);
                                           productNote.add(snapshot.data.docs[index]['Product Note'][i]);
                                           productKg.add(snapshot.data.docs[index]['kg'][i]);
                                           productPao.add(snapshot.data.docs[index]['pao'][i]);
                                           productPrice.add(snapshot.data.docs[index]['Product Price'][i]);
+                                          productUnit.add(snapshot.data.docs[index]['Product Unit'][i]);
                                         }
                                         Navigator.push(
                                           context,
@@ -546,6 +557,8 @@ class _HomePageState extends State<HomePage> {
                                                     productName: productName,
                                                     productNote: productNote,
                                                     productKg: productKg,
+                                                    customerId: customerId,
+                                                    productUnit:productUnit ,
                                                     productPao: productPao,
                                                     productPrice: productPrice,
                                                     total: snapshot.data.docs[index]["Total Price"],
@@ -554,6 +567,8 @@ class _HomePageState extends State<HomePage> {
                                                     customerTokenId: customerTokenId,
                                                     uid: widget.uid,
                                                     customerName: customerName,
+                                                    shopTokenId: tokenId,
+                                                    shopName: shopName,
                                                     showButton: false,
                                                   )),
                                         );
