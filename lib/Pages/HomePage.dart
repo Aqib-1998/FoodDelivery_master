@@ -271,7 +271,7 @@ class _HomePageState extends State<HomePage> {
                               height: 15,
                             ),
                             customButton('Shop Menu', () {
-                              initOneSignal(context);
+
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -365,6 +365,7 @@ class _HomePageState extends State<HomePage> {
                                   child: Text("No Order in Queue! "),
                                 );
                               }
+                              initOneSignal(context);
                               return ListView.builder(
                                 itemCount: snapshot.data.docs.length,
                                 itemBuilder: (context, index) {

@@ -43,6 +43,7 @@ class _NamePageState extends State<NamePage> {
                     }else if(nameController.text.isNotEmpty){
                       FirebaseFirestore.instance.collection("Shop Users").doc(widget.uid).update({
                         'Username' : nameController.text,
+                        'New user?' : false
                       }).whenComplete((){
                         Navigator.push(
                           context,
