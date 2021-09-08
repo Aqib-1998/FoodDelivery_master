@@ -56,7 +56,8 @@ Widget locationTextField(String hintText, TextInputType textInputType,
           suffixIcon: InkWell(child: Container(child: Icon(Icons.add_location,color: Colors.black,),),onTap: onTap,),
           hintStyle: TextStyle(fontWeight: FontWeight.w400, fontSize: 12),
           contentPadding:
-          const EdgeInsets.symmetric(vertical: 22.0, horizontal: 16)),
+          const EdgeInsets.symmetric(vertical: 22.0, horizontal: 16)
+      ),
     ),
   );
 }

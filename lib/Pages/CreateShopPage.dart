@@ -195,7 +195,6 @@ class _CreateShopPageState extends State<CreateShopPage> {
                   customElevatedButton("Create Shop", buttonEnable?() async {
                     // var status = await OneSignal.shared.getPermissionSubscriptionState();
                     // String tokenId = status.subscriptionStatus.userId;
-                    print(1);
                     if (shopContactController.text.isNotEmpty && shopContactController.text.length == 10 &&
                         shopAddressController.text.isNotEmpty &&
                         shopNameController.text.isNotEmpty &&
